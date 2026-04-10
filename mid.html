@@ -149,6 +149,15 @@ body::before {
   font-size: 26px;
   margin-bottom: 12px;
   position: relative;
+  overflow: hidden;
+  background: #1c1c32;
+}
+.champ-icon img {
+  width: 115%;
+  height: 115%;
+  object-fit: cover;
+  object-position: center 15%;
+  border-radius: 50%;
 }
 .champ-icon::after {
   content: '';
@@ -297,8 +306,8 @@ body::before {
 
       var dmgClass = c.damage === 'AP' ? 'dmg-ap' : c.damage === 'AD' ? 'dmg-ad' : 'dmg-mix';
       var archColor = ARCHETYPE_COLOR[c.archetype] || '#aaa';
-      var emoji = EMOJI[c.archetype] || '✨';
       var stars = DIFFICULTY_LABEL[c.difficulty] || '';
+      var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + c.en + '.png';
 
       var card = document.createElement('a');
       card.className = 'champ-card';
@@ -306,7 +315,7 @@ body::before {
       card.style.animationDelay = (idx * 30) + 'ms';
 
       card.innerHTML =
-        '<div class="champ-icon" style="background:' + archColor + '22">' + emoji + '</div>' +
+        '<div class="champ-icon"><img src="' + imgUrl + '" alt="' + c.name + '"></div>' +
         '<div class="champ-name-jp">' + c.name + '</div>' +
         '<div class="champ-name-en">' + c.en.toUpperCase() + '</div>' +
         '<div class="champ-arch-badge" style="color:' + archColor + ';border-color:' + archColor + '55">' + c.archetype + '</div>' +

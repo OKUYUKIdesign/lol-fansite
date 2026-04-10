@@ -90,6 +90,15 @@ body::before {
   font-size: 52px;
   flex-shrink: 0;
   position: relative;
+  overflow: hidden;
+  background: #1c1c32;
+}
+.hero-icon img {
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  object-position: center 10%;
+  border-radius: 20px;
 }
 .hero-icon::after {
   content: '';
@@ -530,19 +539,7 @@ body::before {
   document.title = c.name + ' — MID LANE GUIDE';
 
   // ── Helpers ──
-  var EMOJI = {
-    'コントロールメイジ':       '🔮',
-    'APアサシン':               '⚡',
-    'ADアサシン':               '🗡️',
-    'バーストメイジ':           '💥',
-    'アーティラリーメイジ':     '🏹',
-    'APファイター':             '🔥',
-    'ファイター':               '⚔️',
-    'マークスマン（AD/AP混合）':'🎯',
-    'スケーリングメイジ':       '🌟',
-    'タンク/コントロールメイジ':'🛡️'
-  };
-  var emoji = EMOJI[c.archetype] || '✨';
+  var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + c.en + '.png';
 
   var dmgBadgeClass = c.damage === 'AP' ? 'badge-dmg-ap' : c.damage === 'AD' ? 'badge-dmg-ad' : 'badge-dmg-mix';
 
@@ -651,7 +648,7 @@ body::before {
   var html =
     // HERO
     '<div class="champ-hero">' +
-      '<div class="hero-icon" style="background:' + c.color + '22">' + emoji + '</div>' +
+      '<div class="hero-icon"><img src="' + imgUrl + '" alt="' + c.name + '"></div>' +
       '<div class="hero-info">' +
         '<div class="hero-eyebrow">MID LANE</div>' +
         '<div class="hero-name">' + c.en.toUpperCase() + '</div>' +
