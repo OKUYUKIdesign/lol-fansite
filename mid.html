@@ -252,7 +252,7 @@ body::before {
       <a href="index.html" style="display:inline-block;margin-bottom:12px;font-size:11px;letter-spacing:3px;color:var(--accent);text-decoration:none;opacity:0.8">← HOME</a>
       <div class="logo-eyebrow">League of Legends Fansite</div>
       <h1 class="logo-title">MID<br><span>LANE</span><br>GUIDE</h1>
-      <p class="logo-sub">Patch 26.7 対応 ／ 23チャンプ収録</p>
+      <p class="logo-sub">Patch 26.7 対応 ／ 30チャンプ収録</p>
     </div>
     <div class="header-stats">
       <div class="hstat">
@@ -307,7 +307,8 @@ body::before {
       var dmgClass = c.damage === 'AP' ? 'dmg-ap' : c.damage === 'AD' ? 'dmg-ad' : 'dmg-mix';
       var archColor = ARCHETYPE_COLOR[c.archetype] || '#aaa';
       var stars = DIFFICULTY_LABEL[c.difficulty] || '';
-      var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + c.en + '.png';
+      var DD_ID = { 'LeBlanc': 'Leblanc', 'Aurelion Sol': 'AurelionSol' };
+      var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + (DD_ID[c.en] || c.en) + '.png';
 
       var card = document.createElement('a');
       card.className = 'champ-card';

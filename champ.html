@@ -539,7 +539,8 @@ body::before {
   document.title = c.name + ' — MID LANE GUIDE';
 
   // ── Helpers ──
-  var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + c.en + '.png';
+  var DD_ID = { 'LeBlanc': 'Leblanc', 'Aurelion Sol': 'AurelionSol' };
+  var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + (DD_ID[c.en] || c.en) + '.png';
 
   var dmgBadgeClass = c.damage === 'AP' ? 'badge-dmg-ap' : c.damage === 'AD' ? 'badge-dmg-ad' : 'badge-dmg-mix';
 
@@ -604,7 +605,9 @@ body::before {
     'アフターショック':  '🛡️',
     'アークエンジェル':  '👼',
     'グレイシャル・オーグメント': '❄️',
-    'レタリビューション': '🌟'
+    'レタリビューション': '🌟',
+    'レタルテンポ':      '⚔️',
+    'インスピレーション':'💡'
   };
   var runeIcon = runeIcons[c.runes.main] || '💎';
 
