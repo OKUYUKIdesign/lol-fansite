@@ -169,7 +169,7 @@ body::after {
 /* ── CONTENT CARDS ── */
 .content-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
@@ -294,10 +294,8 @@ body::after {
   align-items: center;
   padding: 36px 32px;
 }
-@media (max-width: 600px) {
-  .content-card.featured {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 560px) {
+  .content-cards { grid-template-columns: 1fr; }
 }
 .featured-visual {
   background: linear-gradient(135deg, rgba(124,111,255,0.15), rgba(255,111,216,0.1));
@@ -432,24 +430,22 @@ body::after {
 
     <div class="content-cards">
 
-      <!-- チャンプ診断 (featured) -->
-      <a href="lol_champion_finder_v3.html" class="content-card featured">
-        <div class="featured-visual">🎯</div>
-        <div>
-          <div class="card-tag">診断テスト</div>
-          <div class="card-title">CHAMPION<br>FINDER</div>
-          <div class="card-desc">
-            ロールを選んで10問に答えるだけ。あなたのプレイスタイルにぴったりのチャンピオンが見つかる。全5ロール対応、各24チャンプ収録。
-          </div>
-          <div class="card-meta">
-            <span class="card-chip">全5ロール</span>
-            <span class="card-chip">各24チャンプ</span>
-            <span class="card-chip">10問診断</span>
-          </div>
-          <div class="card-cta">
-            診断スタート
-            <div class="card-cta-arrow">→</div>
-          </div>
+      <!-- チャンプ診断 -->
+      <a href="lol_champion_finder_v3.html" class="content-card">
+        <span class="card-icon">🎯</span>
+        <div class="card-tag">診断テスト</div>
+        <div class="card-title">CHAMPION<br>FINDER</div>
+        <div class="card-desc">
+          ロールを選んで10問に答えるだけ。あなたのプレイスタイルにぴったりのチャンピオンが見つかる。全5ロール対応、各24チャンプ収録。
+        </div>
+        <div class="card-meta">
+          <span class="card-chip">全5ロール</span>
+          <span class="card-chip">各24チャンプ</span>
+          <span class="card-chip">10問診断</span>
+        </div>
+        <div class="card-cta">
+          診断スタート
+          <div class="card-cta-arrow">→</div>
         </div>
       </a>
 
