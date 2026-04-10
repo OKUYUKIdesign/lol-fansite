@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoL Champion Finder</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+:root{
+  --bg:#050810;--panel:#0b1020;--panel2:#0d1428;
+  --border:rgba(180,140,60,0.18);--gold:#C8A84B;--gold2:#e8c87a;
+  --glow:rgba(200,168,75,0.3);--text:#d8c8a0;--muted:rgba(210,195,160,0.5);--white:#f0e4cc;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 10% 70%,rgba(200,168,75,0.03) 0%,transparent 60%),radial-gradient(ellipse 50% 70% at 90% 10%,rgba(74,159,232,0.03) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:40px 18px 100px;}
+
+/* HEADER */
+.hdr{text-align:center;margin-bottom:48px;animation:fadeD .8s ease both;}
+.hdr-eye{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:7px;color:var(--gold);opacity:.7;text-transform:uppercase;margin-bottom:10px;}
+.hdr-h1{font-family:'Rajdhani',sans-serif;font-size:clamp(34px,9vw,60px);font-weight:700;color:var(--gold);letter-spacing:4px;text-shadow:0 0 50px var(--glow);line-height:1;}
+.hdr-sub{margin-top:14px;font-size:12px;color:var(--muted);line-height:2;}
+.gold-hr{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto;}
+
+/* ROLE GRID */
+#s-role{animation:fadeU .6s ease both;}
+.role-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+@media(max-width:480px){.role-grid{grid-template-columns:repeat(3,1fr);}}
+.rbtn{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:16px 6px 13px;cursor:pointer;transition:all .22s;text-align:center;color:var(--muted);position:relative;overflow:hidden;}
+.rbtn::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;}
+.rbtn:hover{transform:translateY(-3px);box-shadow:0 10px 35px rgba(0,0,0,.4);}
+.rbtn:hover::before{opacity:1;}
+.rbtn .ri{font-size:26px;display:block;margin-bottom:7px;}
+.rbtn .rn{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--text);}
+.rbtn .rs{font-size:9px;color:var(--muted);margin-top:2px;}
+.r-top:hover{border-color:#e8563a;box-shadow:0 0 25px rgba(232,86,58,.2)!important;}
+.r-jg:hover{border-color:#4db870;box-shadow:0 0 25px rgba(77,184,112,.2)!important;}
+.r-mid:hover{border-color:#4a9fe8;box-shadow:0 0 25px rgba(74,159,232,.2)!important;}
+.r-bot:hover{border-color:#e8c43a;box-shadow:0 0 25px rgba(232,196,58,.2)!important;}
+.r-sup:hover{border-color:#b04ae8;box-shadow:0 0 25px rgba(176,74,232,.2)!important;}
+
+/* QUIZ */
+#s-quiz{display:none;}
+#s-quiz.on{display:block;animation:fadeU .5s ease both;}
+.qhdr{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.rbadge{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;padding:3px 11px;border-radius:3px;border:1px solid;text-transform:uppercase;}
+.qtitle{font-family:'Rajdhani',sans-serif;font-size:12px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+.prow{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.plbl{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gold);opacity:.7;}
+.pbar{background:rgba(200,168,75,.07);height:2px;border-radius:1px;margin-bottom:24px;overflow:hidden;}
+.pfill{height:100%;background:var(--gold);transition:width .5s ease;box-shadow:0 0 8px var(--glow);}
+.qcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:26px 22px;display:none;animation:slideR .38s ease;}
+.qcard.on{display:block;}
+.qnum{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:3px;color:var(--gold);opacity:.55;margin-bottom:8px;}
+.qtxt{font-size:16px;font-weight:700;color:var(--white);line-height:1.7;margin-bottom:20px;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt{background:rgba(255,255,255,.02);border:1px solid rgba(200,168,75,.1);border-radius:7px;padding:12px 15px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:13px;text-align:left;cursor:pointer;transition:all .18s;line-height:1.6;display:flex;align-items:flex-start;gap:11px;}
+.opt-e{font-size:17px;flex-shrink:0;margin-top:1px;}
+.opt:hover{background:rgba(200,168,75,.07);border-color:var(--gold);color:var(--white);transform:translateX(3px);}
+.opt.sel{background:rgba(200,168,75,.1);border-color:var(--gold);color:var(--white);}
+
+/* RESULT */
+#s-res{display:none;}
+#s-res.on{display:block;animation:fadeU .6s ease both;}
+.res-hero{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:34px 26px 26px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;}
+.res-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.res-eye{font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:5px;color:var(--gold);opacity:.65;margin-bottom:10px;}
+.res-name{font-family:'Rajdhani',sans-serif;font-size:clamp(30px,8vw,50px);font-weight:700;color:var(--gold);text-shadow:0 0 40px var(--glow);letter-spacing:3px;line-height:1.1;margin-bottom:5px;}
+.res-arch{font-size:11px;letter-spacing:3px;color:var(--muted);margin-bottom:20px;}
+.srow{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.scell{background:rgba(200,168,75,.04);border:1px solid rgba(200,168,75,.1);border-radius:5px;padding:9px 5px;text-align:center;}
+.sv{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--gold);display:block;}
+.sk{font-size:9px;letter-spacing:1px;color:var(--muted);display:block;margin-top:2px;}
+.picks{display:flex;flex-direction:column;gap:9px;margin-bottom:14px;}
+.pick{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:16px 18px;position:relative;overflow:hidden;}
+.pick.top{border-color:rgba(200,168,75,.4);}
+.pick.top::after{content:'TOP PICK';position:absolute;top:9px;right:13px;font-family:'Rajdhani',sans-serif;font-size:8px;letter-spacing:2px;color:var(--gold);opacity:.75;}
+.pname{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--gold);letter-spacing:1px;margin-bottom:5px;}
+.pdesc{font-size:12px;color:var(--muted);line-height:1.85;margin-bottom:9px;}
+.ptags{display:flex;flex-wrap:wrap;gap:4px;}
+.ptag{font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:1px;border:1px solid rgba(200,168,75,.28);padding:2px 7px;border-radius:3px;color:rgba(200,168,75,.75);}
+.comment{background:rgba(200,168,75,.04);border:1px solid rgba(200,168,75,.13);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 16px;font-size:12px;line-height:1.95;color:var(--muted);margin-bottom:14px;}
+.btns{display:flex;gap:9px;}
+.btn-s,.btn-p{flex:1;padding:12px;border-radius:6px;font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.btn-s{background:transparent;border:1px solid rgba(200,168,75,.38);color:var(--gold);}
+.btn-s:hover{background:rgba(200,168,75,.07);box-shadow:0 0 15px var(--glow);}
+.btn-p{background:rgba(200,168,75,.1);border:1px solid var(--gold);color:var(--gold);}
+.btn-p:hover{background:rgba(200,168,75,.18);box-shadow:0 0 20px var(--glow);}
+
+@keyframes fadeD{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeU{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideR{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hdr">
+  <a href="index.html" style="display:inline-block;margin-bottom:14px;font-size:10px;letter-spacing:3px;color:var(--gold);text-decoration:none;opacity:0.7">← HOME</a>
+  <div class="hdr-eye">League of Legends</div>
+  <h1 class="hdr-h1">CHAMPION<br>FINDER</h1>
+  <div class="gold-hr"></div>
+  <p class="hdr-sub">ロールを選んで10問に答えるだけ<br>あなたにぴったりのチャンピオンが見つかる</p>
+</header>
+
+<div id="s-role">
+  <div class="role-grid">
+    <button class="rbtn r-top" id="btn-top"><span class="ri">⚔️</span><div class="rn">TOP</div><div class="rs">トップレーン</div></button>
+    <button class="rbtn r-jg"  id="btn-jg"><span class="ri">🌿</span><div class="rn">JG</div><div class="rs">ジャングル</div></button>
+    <button class="rbtn r-mid" id="btn-mid"><span class="ri">✨</span><div class="rn">MID</div><div class="rs">ミッドレーン</div></button>
+    <button class="rbtn r-bot" id="btn-bot"><span class="ri">🎯</span><div class="rn">BOT</div><div class="rs">ボットレーン</div></button>
+    <button class="rbtn r-sup" id="btn-sup"><span class="ri">🛡️</span><div class="rn">SUP</div><div class="rs">サポート</div></button>
+  </div>
+</div>
+
+<div id="s-quiz" style="display:none">
+  <div class="qhdr"><div class="rbadge" id="qbadge"></div><div class="qtitle">チャンプ診断</div></div>
+  <div class="prow"><span class="plbl" id="plbl">Q1/10</span><span class="plbl" id="ppct">0%</span></div>
+  <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+  <div id="qwrap"></div>
+</div>
+
+<div id="s-res" style="display:none">
+  <div class="res-hero">
+    <div class="res-eye">// 診断結果</div>
+    <div class="res-name" id="rname">---</div>
+    <div class="res-arch" id="rarch">---</div>
+    <div class="srow" id="rstats"></div>
+  </div>
+  <div class="picks" id="rpicks"></div>
+  <div class="comment" id="rcomment"></div>
+  <div class="btns">
+    <button class="btn-s" id="btn-retry">↺ 再診断</button>
+    <button class="btn-p" id="btn-top2">▤ ロール選択</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+var TOP={
+  label:'TOP LANE',color:'#e8563a',
+  qs:[
+    {q:'序盤のレーン戦、どんなスタイルが好き？',
+     o:[{e:'👊',t:'序盤から殴り合って対面を圧倒したい',v:'bully'},
+        {e:'🌱',t:'ファーム重視で後半スパイクを狙う',v:'scale'},
+        {e:'🏹',t:'遠距離ポークで安全に削り続けたい',v:'poke'},
+        {e:'🗺️',t:'レーンを押してローム・テレポで助けに行きたい',v:'roam'}]},
+    {q:'集団戦でやりたい役割は？',
+     o:[{e:'🛡️',t:'前線タンクとして壁になり味方を守る',v:'front'},
+        {e:'⚔️',t:'後衛に飛び込んでキャリーを仕留めるダイバー',v:'dive'},
+        {e:'💥',t:'高火力キャリーとして暴れ回る',v:'carry'},
+        {e:'🗼',t:'スプリットでサイドレーンを割り続ける',v:'split'}]},
+    {q:'1v1の強さはどのくらい求める？',
+     o:[{e:'👑',t:'全チャンプ最強の1v1デュエリストになりたい',v:'duel'},
+        {e:'⚖️',t:'1v1もチームファイトもどちらも高いレベルでこなしたい',v:'both'},
+        {e:'🤝',t:'1v1より集団戦・マクロへの貢献を重視したい',v:'team'}]},
+    {q:'好みのダメージタイプは？',
+     o:[{e:'🗡️',t:'ADフィジカルダメージ',v:'ad'},
+        {e:'✨',t:'APマジックダメージ',v:'ap'},
+        {e:'⚡',t:'真ダメージ・混合ダメージ',v:'true'},
+        {e:'🌀',t:'どちらでも強ければOK',v:'any'}]},
+    {q:'難易度の許容範囲は？',
+     o:[{e:'😌',t:'シンプルで直感的に動けるチャンプがいい',v:'easy'},
+        {e:'🎮',t:'中難易度、練習すれば使いこなせる程度',v:'mid'},
+        {e:'🔥',t:'超高難易度でも天井が高いやつがいい',v:'hard'}]},
+    {q:'どのタイミングで強さを発揮したい？',
+     o:[{e:'⚡',t:'序盤からプレッシャーをかけてスノーボール',v:'early'},
+        {e:'🌙',t:'後半アイテムが揃ってから真価を発揮する',v:'late'},
+        {e:'♾️',t:'序盤〜終盤まで常に安定して強い',v:'all'}]},
+    {q:'どんな瞬間が一番楽しい？',
+     o:[{e:'💀',t:'対面を圧倒してレーンを完全支配した瞬間',v:'dominate'},
+        {e:'🔄',t:'不利をひっくり返してチームを救った瞬間',v:'comeback'},
+        {e:'🗼',t:'タワーを次々と壊してマップを制圧した瞬間',v:'tower'},
+        {e:'💥',t:'集団戦で大暴れして複数キルを取った瞬間',v:'teamfight'}]},
+    {q:'タンクについてどう思う？',
+     o:[{e:'🧱',t:'タンクとしてチームを守る役割が好き',v:'tank'},
+        {e:'⚔️',t:'タンクより火力・キャリーよりの役割が好き',v:'fighter'},
+        {e:'🔀',t:'状況に応じてタンクにも火力にもなれる柔軟性が好き',v:'flex'}]},
+    {q:'プレイスタイルを一言で表すと？',
+     o:[{e:'🦁',t:'積極果敢・常に仕掛ける側でいたい',v:'aggressive'},
+        {e:'🐢',t:'堅実安定・ミスを減らして確実に勝ちたい',v:'stable'},
+        {e:'🦊',t:'頭脳派・相手の裏をかくプレイが好き',v:'smart'},
+        {e:'🌊',t:'圧倒的なスケールで後半無双したい',v:'scaler'}]},
+    {q:'チームへの貢献スタイルは？',
+     o:[{e:'🌍',t:'マップ全体に影響を与えるグローバルプレイが好き',v:'global'},
+        {e:'💪',t:'個人の強さでレーンを支配して有利を作る',v:'individual'},
+        {e:'🤲',t:'CC・ユーティリティでチームをサポートする',v:'utility'},
+        {e:'🔥',t:'純粋な火力でゲームを決める',v:'damage'}]}
+  ],
+  ch:{
+    garen:{name:'GAREN',arch:'正義の鎧・万能ジャガーノート',
+      st:[{v:'S',k:'SIMPLE'},{v:'A',k:'BULLY'},{v:'A',k:'EARLY'},{v:'B',k:'SCALE'}],
+      picks:[
+        {name:'ガレン',desc:'Patch26.7ピック率No.1トップ（14%）。シンプルなキットで高い勝率を誇る安定の一枚。QとEのトレードからRの処刑まで流れが直感的。タンクでもファイターでも機能する。',tags:['JUGGERNAUT','SIMPLE','AD','BULLY']},
+        {name:'ダリウス',desc:'ガレンと同じく序盤番長スタイル。Rのノクシアン・ギロティンリセットが集団戦で爆発。シルバー帯では相手が対処できないことも多い。',tags:['JUGGERNAUT','BULLY','AD','RESET']}
+      ],comment:'シンプルに強くて確実に勝ちたいあなたにはガレンが完璧。難しいことを考えず力で押し切るスタイルはオートフィルでも安心の最強安定枠。'},
+    darius:{name:'DARIUS',arch:'ノクサス親衛隊・レーン支配者',
+      st:[{v:'S',k:'BULLY'},{v:'A',k:'KILL'},{v:'B',k:'SPLIT'},{v:'A',k:'EARLY'}],
+      picks:[
+        {name:'ダリウス',desc:'出血スタックとRリセットによる集団戦の爆発力が魅力。序盤から圧倒的なプレッシャーで対面を精神的に追い詰めるスタイルが最高に気持ちいい。',tags:['JUGGERNAUT','BULLY','AD','RESET']},
+        {name:'レネクトン',desc:'ダリウスより序盤のバーストが高く、Eダッシュで機動力もある。スタン込みのコンボが決まった時の破壊力は序盤最強クラス。',tags:['DIVER','BULLY','AD','EARLY']}
+      ],comment:'序盤から圧倒して相手を粉砕したいあなたにはダリウスが最高。Rがリセットされ続ける集団戦の爆発力はLoL随一の爽快感。'},
+    aatrox:{name:'AATROX',arch:'虐殺の世界の剣・万能ファイター',
+      st:[{v:'A',k:'EARLY'},{v:'S',k:'SUSTAIN'},{v:'A',k:'TEAM'},{v:'A',k:'CARRY'}],
+      picks:[
+        {name:'エイトロックス',desc:'Qの3段コンボと自己回復で序盤〜集団戦まで全部こなせる万能ファイター。Rで集団戦に突っ込む爽快感は唯一無二。スキルショット精度が上がるほど強くなる。',tags:['FIGHTER','SUSTAIN','AD','ALL-AROUND']},
+        {name:'セット',desc:'WのヘアリガーアームとRのヴィシャス集団戦インパクトが強烈。シンプルなキットで確実に仕事できる安定枠。',tags:['FIGHTER','SIMPLE','AD','TEAMFIGHT']}
+      ],comment:'バランスよく何でもこなしたいあなたにはエイトロックスが最適解。スキルショット精度を磨くほど強さが増す練習のしがいがあるキャラ。'},
+    irelia:{name:'IRELIA',arch:'剣の舞・ハイスキルダイバー',
+      st:[{v:'S',k:'CARRY'},{v:'S',k:'SKILL'},{v:'A',k:'1V1'},{v:'A',k:'DIVE'}],
+      picks:[
+        {name:'イレリア',desc:'2026年Sティア。Qのリセットとスタック管理を理解すれば誰も止められない。習得コストは最高クラスだが天井も最高クラス。',tags:['DIVER','AD','HIGH SKILL','S-TIER']},
+        {name:'カミール',desc:'フックショットの精度でレベルが決まる職人チャンプ。真ダメージとR隔離が強烈。スプリットと集団戦フランクどちらも強い。',tags:['DIVER','AD','TRUE DAMAGE','SPLIT']}
+      ],comment:'超高難易度を望む座学の鬼なあなたにはイレリアかカミールが最高の挑戦。習得後の爆発力はTOPレーン随一。'},
+    camille:{name:'CAMILLE',arch:'鋼の影・プレシジョン処刑者',
+      st:[{v:'S',k:'SKILL'},{v:'S',k:'DIVE'},{v:'A',k:'SPLIT'},{v:'A',k:'TRUE'}],
+      picks:[
+        {name:'カミール',desc:'フックショットの角度が上手ければ上手いほど強くなる。R隔離でキャリーを完全封殺するプレイが最高に気持ちいい。2026年最高のダイバーと評価。',tags:['DIVER','AD','TRUE DAMAGE','HIGH SKILL']},
+        {name:'イレリア',desc:'カミールと同じく高難易度ダイバー。Qリセットの連続ダッシュが決まった時の爽快感はLoL随一。',tags:['DIVER','AD','HIGH SKILL','S-TIER']}
+      ],comment:'スキルショット得意でハイメカを求めるあなたにカミールは完璧にフィット。フックショットの角度読みを極めることが即ち強さに直結。'},
+    fiora:{name:'FIORA',arch:'剣の最高傑作・最強デュエリスト',
+      st:[{v:'S+',k:'1V1'},{v:'S',k:'SPLIT'},{v:'B',k:'TEAM'},{v:'S',k:'CARRY'}],
+      picks:[
+        {name:'フィオラ',desc:'バイタルシステムとQの精度で全てが決まる究極の1v1チャンプ。真ダメージでどんなタンクも溶かせるスプリット最強格。1v1に関しては全チャンプ最強クラス。',tags:['DUELIST','TRUE DAMAGE','SPLIT','S-TIER']},
+        {name:'カミール',desc:'フィオラより集団戦への貢献が高くバランスがいい。1v1の強さは少し落ちるが全体的な影響力で勝る。',tags:['DIVER','AD','SPLIT','BALANCED']}
+      ],comment:'1v1で絶対に勝つという強い意志のあなたにはフィオラが唯一の答え。バイタル管理を完璧に習得すると本当に誰にも負けなくなる。'},
+    gwen:{name:'GWEN',arch:'針と糸の人形・レイトキャリー',
+      st:[{v:'B',k:'EARLY'},{v:'S',k:'LATE'},{v:'S',k:'TANK'},{v:'A',k:'AP'}],
+      picks:[
+        {name:'グウェン',desc:'2026年TOPの女王クラス。タンクへのダメージ効率が異常に高く、育った後の集団戦貢献は誰も止められない。序盤の我慢が必要だが後半の無双感は格別。',tags:['FIGHTER','AP','LATE GAME','TANK KILLER']},
+        {name:'ケイル',desc:'グウェンと同じく後半爆発型。レベル11・16で急激に進化するハイパースケーラー。育った後の射程と火力は全チャンプ中最高クラス。',tags:['HYPERCARRY','AP/AD','LATE GAME','SCALING']}
+      ],comment:'後半に爆発する育成型スタイルが好きなあなたにはグウェンかケイルが刺さる。序盤の苦しさを乗り越えた後の無双感は他のチャンプでは味わえない。'},
+    rumble:{name:'RUMBLE',arch:'体温管理・APポーカー',
+      st:[{v:'A',k:'POKE'},{v:'S',k:'TEAMFIGHT'},{v:'B',k:'1V1'},{v:'A',k:'AP'}],
+      picks:[
+        {name:'ランブル',desc:'体温管理というユニークなシステムと炎の嵐Rによる集団戦制圧力が魅力。遠距離ポークで削ってからRで戦況をひっくり返すスタイルが最高に気持ちいい。',tags:['MAGE','AP','POKE','TEAMFIGHT']},
+        {name:'モルデカイザー',desc:'Rで相手を別次元に引きずり込む特殊な1v1強制システムが強烈。タンクなのにAP火力もある扱いやすい枠。',tags:['JUGGERNAUT','AP','1V1','SPECIAL']}
+      ],comment:'ポークしながら集団戦でも活躍したいあなたにはランブルがドンピシャ。体温管理を習得すると急に強さを実感できるようになる独特のチャンプ。'},
+    malphite:{name:'MALPHITE',arch:'岩石の化身・集団戦ゲームチェンジャー',
+      st:[{v:'S',k:'ENGAGE'},{v:'S',k:'SIMPLE'},{v:'A',k:'TEAM'},{v:'B',k:'1V1'}],
+      picks:[
+        {name:'マルファイト',desc:'Rのノックアップで集団戦を一発でひっくり返す。完全タンクビルドで死ににくく、ADCの多いゲームで特に有効。操作がシンプルで立ち回りとマクロに集中できる。',tags:['TANK','CC','AP','TEAMFIGHT']},
+        {name:'オーン',desc:'マルファイトと同じくタンクエンゲージャー。集団戦のノックアップCC量が異常で、装備アップグレードでチーム全体を強化できる特殊システムが面白い。',tags:['TANK','CC','UTILITY','UPGRADE']}
+      ],comment:'集団戦でゲームをひっくり返すことが好きなあなたにはマルファイトが最高。Rのタイミングを磨くだけで勝率が爆発的に上がる。'},
+    shen:{name:'SHEN',arch:'影の護衛・グローバルガーディアン',
+      st:[{v:'S',k:'GLOBAL'},{v:'A',k:'TANK'},{v:'S',k:'TEAM'},{v:'A',k:'SPLIT'}],
+      picks:[
+        {name:'シェン',desc:'Patch26.7最高勝率クラスのトップ。全マップR護衛が最高にかっこいい。スプリットしながらRで味方を助けられるユニークなデュアルプレイが楽しい。',tags:['TANK','GLOBAL','SPLIT','RELIABLE']},
+        {name:'マルファイト',desc:'シェンより単純な集団戦インパクトが高い。Rの一発逆転力はトップ随一。',tags:['TANK','CC','ENGAGE','AP']}
+      ],comment:'グローバルプレイとマクロへの影響力を重視するあなたにはシェンが最高の相棒。Rで味方を助けた時の達成感と感謝はLoLで最高の体験のひとつ。'},
+    ornn:{name:'ORNN',arch:'火と岩の神・装備鍛冶師',
+      st:[{v:'S',k:'TANK'},{v:'S',k:'UTILITY'},{v:'A',k:'CC'},{v:'B',k:'CARRY'}],
+      picks:[
+        {name:'オーン',desc:'チーム全員の装備をアップグレードできる唯一無二のユーティリティ。CC量が多く集団戦での壁力が最高クラス。Patch26.7でもトップ安定勝率を維持。',tags:['TANK','UTILITY','CC','UPGRADE']},
+        {name:'シェン',desc:'オーンより機動力とグローバルプレイが強い。両者ともタンク・ユーティリティ型で相性がいい。',tags:['TANK','GLOBAL','SPLIT','RELIABLE']}
+      ],comment:'チームへのユーティリティと集団戦への貢献を最大化したいあなたにはオーンが最適解。装備アップグレードという唯一無二のシステムが戦略好きに刺さる。'},
+    singed:{name:'SINGED',arch:'狂気の錬金術師・マップ支配者',
+      st:[{v:'S',k:'PROXY'},{v:'S',k:'UNIQUE'},{v:'A',k:'LATE'},{v:'C',k:'EASY'}],
+      picks:[
+        {name:'シンジド',desc:'Patch26.7最高勝率トップのひとつ。プロキシーファームとフリングによる特殊スタイルが唯一無二。「追いかける敵を無視して走り続ける」という哲学が面白い。',tags:['MAGE','UNIQUE','AP','PROXY']},
+        {name:'ナサス',desc:'シンジドと同じくファーム重視のスケーラー。スタックが溜まれば後半誰も止められない。シンプルな操作で勝てる安定枠。',tags:['JUGGERNAUT','AD','SCALING','SIMPLE']}
+      ],comment:'独自の哲学でプレイしたいあなたにはシンジドが最高に刺さる。「普通じゃない」プレイスタイルを極めた時の爽快感と戦略性は唯一無二。'},
+    kayle:{name:'KAYLE',arch:'神聖なる天秤・最強ハイパースケーラー',
+      st:[{v:'S',k:'LATE'},{v:'S',k:'HYPERCARRY'},{v:'C',k:'EARLY'},{v:'S',k:'SCALE'}],
+      picks:[
+        {name:'ケイル',desc:'Patch26.7Sティア。レベル11・16での進化が異常なほど強力。育った後はほぼ全チャンプに1v1で勝てる。序盤の我慢さえできれば後半完全無双できる。',tags:['HYPERCARRY','AP/AD','LATE GAME','EVOLUTION']},
+        {name:'グウェン',desc:'ケイルよりも序盤から動けてタンクキラー性能が高い。どちらも後半特化型で相性がいい。',tags:['FIGHTER','AP','TANK KILLER','LATE']}
+      ],comment:'後半の完全無双スタイルを目指すあなたにはケイルが究極の選択。進化後の圧倒的な強さは全トップチャンプ中最高クラス。'},
+    jax:{name:'JAX',arch:'闘技場の最後の戦士・総合王者',
+      st:[{v:'A',k:'1V1'},{v:'A',k:'SPLIT'},{v:'A',k:'SCALE'},{v:'A',k:'DUEL'}],
+      picks:[
+        {name:'ジャックス',desc:'スケールしながら1v1最強クラスに到達するスプリット王。EのカウンターストライクによるAAブロックが独特で、アイテムが揃えば誰とも互角以上に戦える。',tags:['FIGHTER','AD/AP','SPLIT','SCALE']},
+        {name:'トリンダメア',desc:'ジャックスと同じくスプリット特化。Rの無敵でどんな状況でも粘れる。シンプルで強いスプリットプッシャー。',tags:['FIGHTER','AD','SPLIT','UNKILLABLE']}
+      ],comment:'スプリットしながら1v1で無敵になりたいあなたにはジャックスが最高。アイテムが揃った後の「誰にも負けない」感覚は格別。'},
+    gangplank:{name:'GANGPLANK',arch:'海の覇者・グローバル支配者',
+      st:[{v:'S',k:'GLOBAL'},{v:'A',k:'POKE'},{v:'S',k:'SCALE'},{v:'B',k:'EASY'}],
+      picks:[
+        {name:'ガングプランク',desc:'Rの全マップキャノンボムと樽連鎖のコンボが最高に楽しい。習得後の集団戦への影響力と後半スケールは環境トップクラス。Patch26.7でも高勝率を維持。',tags:['FIGHTER','AD','GLOBAL','BARRELS']},
+        {name:'シェン',desc:'ガングプランクよりシンプルにグローバルプレイができる。安定感が高い。',tags:['TANK','GLOBAL','RELIABLE','SPLIT']}
+      ],comment:'グローバルプレイと後半の爆発力を求めるあなたにはガングプランクが最高の挑戦。樽コンボを極めた時の満足感と集団戦インパクトは唯一無二。'},
+    renekton:{name:'RENEKTON',arch:'砂漠の処刑者・序盤番長',
+      st:[{v:'S',k:'EARLY'},{v:'A',k:'BULLY'},{v:'B',k:'LATE'},{v:'A',k:'DIVE'}],
+      picks:[
+        {name:'レネクトン',desc:'序盤最強クラスのいじめ番長。スタン込みEQEコンボのバーストが凶悪で、ダッシュ2回分の機動力がある。序盤に有利を作ってそのまま試合を決めるスタイル。',tags:['DIVER','BULLY','AD','EARLY']},
+        {name:'ダリウス',desc:'レネクトンと同じく序盤番長。Rリセットで集団戦でも爆発できる。',tags:['JUGGERNAUT','BULLY','AD','RESET']}
+      ],comment:'序盤から圧倒的に暴れたいあなたにはレネクトンがドンピシャ。コンボを磨けばどんな対面も序盤で崩壊させられる爽快感がある。'},
+    mordekaiser:{name:'MORDEKAISER',arch:'鉄の幽霊・異次元の支配者',
+      st:[{v:'S',k:'1V1'},{v:'A',k:'TEAMFIGHT'},{v:'S',k:'SPECIAL'},{v:'A',k:'AP'}],
+      picks:[
+        {name:'モルデカイザー',desc:'Rで相手を死の領域に引きずり込む唯一無二のキット。タンクなのにAP火力もあり、育てばどんな相手にも1v1で勝てる。特殊なゲームプレイが楽しい。',tags:['JUGGERNAUT','AP','DEATH REALM','1V1']},
+        {name:'グウェン',desc:'モルデカイザーよりタンクキラー性能が高い。AP枠として似た機能を持つ。',tags:['FIGHTER','AP','TANK KILLER','LATE']}
+      ],comment:'特殊なシステムと1v1の強さを求めるあなたにはモルデカイザーが最高にハマる。Rで相手を別次元に引きずり込む瞬間の強さは唯一無二の体験。'},
+    tryndamere:{name:'TRYNDAMERE',arch:'蛮族の王・無敵スプリッター',
+      st:[{v:'S',k:'SPLIT'},{v:'S',k:'UNKILLABLE'},{v:'B',k:'TEAM'},{v:'A',k:'SIMPLE'}],
+      picks:[
+        {name:'トリンダメア',desc:'Rの無敵でどんな状況でも粘れる最強スプリッター。フリーファームからスプリットで相手を悩ませるシンプルなスタイル。操作が直感的で試合への影響が大きい。',tags:['FIGHTER','AD','SPLIT','UNKILLABLE']},
+        {name:'ジャックス',desc:'トリンダメアよりスケール後の強さが高い。1v1能力と集団戦参加どちらも強い。',tags:['FIGHTER','AD/AP','SPLIT','DUEL']}
+      ],comment:'スプリットして無敵Rで粘るシンプルで強いスタイルが好きなあなたにはトリンダメアが最高。「死ねないRが切れるまで相手を悩ませる」快感は唯一無二。'},
+    nasus:{name:'NASUS',arch:'砂嵐の守護者・スタック無限成長',
+      st:[{v:'S',k:'LATE'},{v:'S',k:'SCALE'},{v:'C',k:'EARLY'},{v:'A',k:'SIMPLE'}],
+      picks:[
+        {name:'ナサス',desc:'Qスタックが溜まれば誰も止められないスケーラー。シンプルな操作でファーム重視のプレイが楽しい。Rで巨大化してダイブしてくる相手を追い返す瞬間が爽快。',tags:['JUGGERNAUT','AD','SCALING','SIMPLE']},
+        {name:'ケイル',desc:'ナサスよりスケール後の火力と射程が高い。どちらも後半特化の安定型。',tags:['HYPERCARRY','AP/AD','SCALING','LATE']}
+      ],comment:'ファームしてスタックを溜めながら後半に無敵になるスタイルが好きなあなたにはナサスが最適。スタックが溜まっていく達成感は他のチャンプでは味わえない。'},
+    sett:{name:'SETT',arch:'ファイト師匠・力押しファイター',
+      st:[{v:'S',k:'SIMPLE'},{v:'A',k:'TEAMFIGHT'},{v:'S',k:'BULLY'},{v:'B',k:'SCALE'}],
+      picks:[
+        {name:'セット',desc:'2026年でも安定高勝率。WのヘアリガーアームとRのヴィシャスでチームを助ける。操作がわかりやすくキットの力で押し切れる。',tags:['FIGHTER','AD','SIMPLE','RELIABLE']},
+        {name:'ダリウス',desc:'セットと同系統の序盤番長スタイル。Rリセットによる集団戦の爆発力がセットより高い。',tags:['JUGGERNAUT','AD','BULLY','RESET']}
+      ],comment:'シンプルに強くて確実に仕事したいあなたにはセットが完璧。難しいことを考えず体力と力で押し切るスタイルはオートフィルの安定枠として最高。'},
+    varus:{name:'VARUS',arch:'復讐の矢・遠距離レンジャー',
+      st:[{v:'A',k:'POKE'},{v:'A',k:'CC'},{v:'A',k:'RANGE'},{v:'B',k:'1V1'}],
+      picks:[
+        {name:'ヴァルス',desc:'Qの長射程チャージショットとRのバインディングで遠距離からポーク&CCができるレンジャー型トップ。タンクに強いブライトレイザービルドが今のメタに刺さる。',tags:['MARKSMAN','AD','POKE','RANGE']},
+        {name:'ランブル',desc:'ヴァルスと同じく遠距離ポーカー系。APとADの違いはあるが似たスタイル。',tags:['MAGE','AP','POKE','TEAMFIGHT']}
+      ],comment:'遠距離からポークしながら安全にレーンを戦いたいあなたにはヴァルスが最高。長射程スキルショットを磨くほど強くなる職人系チャンプ。'},
+    yasuo:{name:'YASUO',arch:'破滅の剣士・ハイスキルキャリー',
+      st:[{v:'S',k:'SKILL'},{v:'S',k:'CARRY'},{v:'A',k:'1V1'},{v:'B',k:'EASY'}],
+      picks:[
+        {name:'ヤスオ',desc:'LoL永遠の人気チャンプ。ウィンドウォールとダッシュコンボが使いこなせれば集団戦で誰も止められない。上達の実感が最も分かりやすいキャラ。',tags:['FIGHTER','AD','HIGH SKILL','POPULAR']},
+        {name:'イレリア',desc:'ヤスオよりも環境メタへの適応力が高い高難度ダイバー。',tags:['DIVER','AD','HIGH SKILL','S-TIER']}
+      ],comment:'ハイスキルで上達を実感しながら強くなりたいあなたにはヤスオが唯一の選択。上手くなった瞬間が最も実感しやすい、LoLの旅を体現したようなキャラ。'},
+    vayne:{name:'VAYNE',arch:'闇の狩人・タンクキラーキャリー',
+      st:[{v:'S',k:'TANK'},{v:'S',k:'CARRY'},{v:'C',k:'EASY'},{v:'S',k:'LATE'}],
+      picks:[
+        {name:'ヴァイン',desc:'真ダメージWで全タンクを溶かせる最強タンクキラー。序盤は非常に弱いが後半の強さは全ADC中最高クラス。Tumbleのコンボを習得すると急激に強くなる。',tags:['MARKSMAN','AD','TANK KILLER','TRUE DAMAGE']},
+        {name:'ケイル',desc:'ヴァインと同じく後半無双型。APキャリーとしてより安全にスケールできる。',tags:['HYPERCARRY','AP/AD','SCALING','LATE']}
+      ],comment:'タンクを溶かして後半に無双するスタイルが好きなあなたにはヴァインが最高。序盤の苦しさを乗り越えた後の爆発力は全トップチャンプ中随一。'}
+  },
+  calc(A){
+    const s={garen:0,darius:0,aatrox:0,irelia:0,camille:0,fiora:0,gwen:0,rumble:0,malphite:0,shen:0,ornn:0,singed:0,kayle:0,jax:0,gangplank:0,renekton:0,mordekaiser:0,tryndamere:0,nasus:0,sett:0,varus:0,yasuo:0,vayne:0};
+    // Q1 laning
+    if(A[0]==='bully'){s.darius+=3;s.renekton+=3;s.sett+=2;s.garen+=2;}
+    if(A[0]==='scale'){s.kayle+=3;s.gwen+=3;s.nasus+=2;s.vayne+=2;}
+    if(A[0]==='poke'){s.rumble+=3;s.varus+=3;s.gangplank+=2;}
+    if(A[0]==='roam'){s.shen+=3;s.gangplank+=2;s.malphite+=1;}
+    // Q2 teamfight
+    if(A[1]==='front'){s.malphite+=3;s.ornn+=3;s.shen+=2;}
+    if(A[1]==='dive'){s.camille+=3;s.irelia+=3;s.renekton+=1;}
+    if(A[1]==='carry'){s.aatrox+=3;s.gwen+=2;s.yasuo+=2;s.vayne+=2;}
+    if(A[1]==='split'){s.fiora+=3;s.tryndamere+=3;s.jax+=2;s.camille+=1;}
+    // Q3 1v1
+    if(A[2]==='duel'){s.fiora+=3;s.jax+=2;s.irelia+=2;s.tryndamere+=2;}
+    if(A[2]==='both'){s.aatrox+=3;s.camille+=2;s.shen+=1;}
+    if(A[2]==='team'){s.malphite+=2;s.ornn+=2;s.shen+=2;s.garen+=1;}
+    // Q4 damage
+    if(A[3]==='ad'){s.darius+=2;s.fiora+=2;s.camille+=2;s.irelia+=2;s.jax+=2;s.renekton+=2;s.tryndamere+=2;s.vayne+=1;}
+    if(A[3]==='ap'){s.rumble+=3;s.gwen+=3;s.mordekaiser+=3;s.singed+=2;}
+    if(A[3]==='true'){s.fiora+=2;s.camille+=2;s.vayne+=2;}
+    if(A[3]==='any'){s.aatrox+=1;s.sett+=1;s.garen+=1;}
+    // Q5 difficulty
+    if(A[4]==='easy'){s.garen+=3;s.sett+=3;s.nasus+=2;s.malphite+=2;s.tryndamere+=2;}
+    if(A[4]==='mid'){s.aatrox+=2;s.gwen+=2;s.rumble+=2;s.jax+=2;s.mordekaiser+=2;}
+    if(A[4]==='hard'){s.irelia+=3;s.camille+=3;s.fiora+=3;s.yasuo+=2;s.gangplank+=2;}
+    // Q6 timing
+    if(A[5]==='early'){s.darius+=2;s.renekton+=3;s.irelia+=2;}
+    if(A[5]==='late'){s.kayle+=3;s.gwen+=2;s.nasus+=2;s.vayne+=2;}
+    if(A[5]==='all'){s.aatrox+=2;s.sett+=2;s.garen+=2;s.jax+=1;}
+    // Q7 fun moment
+    if(A[6]==='dominate'){s.darius+=2;s.fiora+=2;s.renekton+=2;}
+    if(A[6]==='comeback'){s.aatrox+=3;s.gwen+=2;s.tryndamere+=1;}
+    if(A[6]==='tower'){s.fiora+=2;s.tryndamere+=2;s.jax+=2;s.shen+=1;}
+    if(A[6]==='teamfight'){s.rumble+=2;s.malphite+=3;s.ornn+=2;s.sett+=1;}
+    // Q8 tank/fighter
+    if(A[7]==='tank'){s.malphite+=3;s.ornn+=3;s.shen+=2;s.garen+=1;}
+    if(A[7]==='fighter'){s.darius+=2;s.aatrox+=2;s.mordekaiser+=2;s.yasuo+=2;}
+    if(A[7]==='flex'){s.sett+=2;s.jax+=2;s.aatrox+=1;s.camille+=1;}
+    // Q9 playstyle
+    if(A[8]==='aggressive'){s.darius+=2;s.renekton+=2;s.irelia+=2;s.yasuo+=1;}
+    if(A[8]==='stable'){s.sett+=2;s.aatrox+=2;s.garen+=2;}
+    if(A[8]==='smart'){s.camille+=2;s.fiora+=2;s.gangplank+=2;s.singed+=2;}
+    if(A[8]==='scaler'){s.kayle+=3;s.nasus+=3;s.gwen+=2;s.vayne+=2;}
+    // Q10 contribution
+    if(A[9]==='global'){s.shen+=3;s.gangplank+=3;s.malphite+=1;}
+    if(A[9]==='individual'){s.fiora+=2;s.tryndamere+=2;s.vayne+=2;s.jax+=2;}
+    if(A[9]==='utility'){s.ornn+=3;s.shen+=2;s.malphite+=2;}
+    if(A[9]==='damage'){s.irelia+=2;s.yasuo+=2;s.rumble+=2;s.mordekaiser+=2;}
+    return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+};
+
+// ============================================================
+// JUNGLE — 24 champs, 10 questions
+// ============================================================
+
+var JG={
+  label:'JUNGLE',color:'#4db870',
+  qs:[
+    {q:'序盤のJG、何を最優先にする？',
+     o:[{e:'⚡',t:'レベル3〜4で即ガンク、レーンをスノーボールさせる',v:'gank'},
+        {e:'🌿',t:'しっかりフルクリアして強くなってから動く',v:'farm'},
+        {e:'💀',t:'相手のキャンプを荒らしてアドバンテージを奪う',v:'invade'},
+        {e:'🎯',t:'ドラゴン・バロンなどオブジェクトを最優先する',v:'obj'}]},
+    {q:'集団戦での理想の役割は？',
+     o:[{e:'🛡️',t:'前線エンゲージでチームを引っ張る',v:'engage'},
+        {e:'🗡️',t:'後衛に飛び込んでキャリーを瞬殺するアサシン',v:'assassin'},
+        {e:'⚔️',t:'中衛で戦い続けるファイター、継続ダメージで制圧',v:'fighter'},
+        {e:'🌀',t:'特殊システムや変則プレイでゲームを動かす',v:'special'}]},
+    {q:'1v1対決の方針は？',
+     o:[{e:'👊',t:'相手JGと直接ぶつかって絶対に勝てる強さが欲しい',v:'win'},
+        {e:'👻',t:'正面衝突は避けて有利な場面だけ戦う',v:'avoid'},
+        {e:'🤝',t:'1v1より味方と連携して数的有利で戦う方が好き',v:'team'}]},
+    {q:'ガンクスタイルの好みは？',
+     o:[{e:'💨',t:'高速で突撃、逃げ場を作らないハードガンク',v:'hard'},
+        {e:'🎣',t:'CCで確実に捕まえる安全なガンク',v:'cc'},
+        {e:'👁️',t:'視界外から奇襲、盲点を突くステルスガンク',v:'stealth'},
+        {e:'🔥',t:'ガンクよりも集団戦参加と暴れ方を重視',v:'teamfight'}]},
+    {q:'難易度の好みは？',
+     o:[{e:'😌',t:'シンプルで直感的に強いチャンプがいい',v:'easy'},
+        {e:'🎮',t:'練習すれば使いこなせる中難易度でいい',v:'mid'},
+        {e:'🔥',t:'超高難易度でも天井が高いやつがいい',v:'hard'}]},
+    {q:'ゲームへの影響タイミングは？',
+     o:[{e:'🌅',t:'序盤から暴れてスノーボール、早く試合を決めたい',v:'early'},
+        {e:'🌙',t:'後半にスケール、アイテムが揃ってから無双したい',v:'late'},
+        {e:'♾️',t:'常に安定して強い、どのフェーズでも仕事したい',v:'all'}]},
+    {q:'JGで楽しいと感じる瞬間は？',
+     o:[{e:'💥',t:'敵キャリーを瞬殺した時の爽快感',v:'kill'},
+        {e:'🔄',t:'不利状況をひっくり返してチームを救う瞬間',v:'save'},
+        {e:'😱',t:'マップ全体に恐怖とプレッシャーを与える瞬間',v:'fear'},
+        {e:'🏆',t:'完璧なオブジェクト管理でゲームをコントロールする瞬間',v:'control'}]},
+    {q:'どんなJGになりたい？',
+     o:[{e:'🦅',t:'常にマップを動き回る積極的なガンカー',v:'active'},
+        {e:'🐍',t:'隠れて隙をついて一撃で仕留めるハンター',v:'hunter'},
+        {e:'🦣',t:'前線で壁になりながらチームを支える重戦車',v:'tank'},
+        {e:'🌊',t:'後半に真価を発揮するスケーラー',v:'scaler'}]},
+    {q:'特殊なシステムが好き？',
+     o:[{e:'🔮',t:'変形・進化・フォームチェンジなど特殊なシステムが好き',v:'special'},
+        {e:'🎯',t:'シンプルなキットを極めることに満足感がある',v:'simple'},
+        {e:'📈',t:'スタックや成長要素があるチャンプが好き',v:'stack'}]},
+    {q:'チームへの貢献の仕方は？',
+     o:[{e:'💪',t:'個人の強さでスノーボールしてキャリーする',v:'carry'},
+        {e:'🤲',t:'CCとユーティリティでチームメイトを活かす',v:'util'},
+        {e:'🗺️',t:'ビジョンコントロールとマクロでゲームを支配する',v:'macro'},
+        {e:'⚡',t:'スピードと機動力でどこにでも先回りする',v:'speed'}]}
+  ],
+  ch:{
+    leeSin:{name:'LEE SIN',arch:'盲目の僧侶・ザ・プレイメイカー',
+      st:[{v:'S',k:'GANK'},{v:'S+',k:'SKILL'},{v:'A',k:'EARLY'},{v:'B',k:'SCALE'}],
+      picks:[
+        {name:'リー・シン',desc:'JGの代名詞。インセック・キックを決めた時の爽快感はLoL最高レベル。序盤の圧倒的プレッシャーで試合を動かす。天井は際限なく高い。',tags:['HIGH SKILL','EARLY','PLAYMAKER','AD']},
+        {name:'ジャーバン IV',desc:'Q→Eコンボで確実に仕事できるオールラウンダー。リーシンより安定感があり、RのアリーナCCが集団戦を決定づける。',tags:['ENGAGE','CC','AD','RELIABLE']}
+      ],comment:'派手なプレイメイクが好きなあなたにはリーシンが完璧にハマる。インセックを習得した日から別次元のJGになれる。'},
+    khazix:{name:"KHA'ZIX",arch:'虚空の進化体・孤立ハンター',
+      st:[{v:'S',k:'KILL'},{v:'S',k:'INVADE'},{v:'B',k:'TEAM'},{v:'A',k:'EVOLVE'}],
+      picks:[
+        {name:'カジックス',desc:'孤立した敵への追加ダメージが異常。1v1最強クラスでインベードが得意。毎試合Evolutionを選択する戦略性が座学好きに刺さる。',tags:['ASSASSIN','ISOLATE','AD','EVOLUTION']},
+        {name:'レンガー',desc:'ブッシュを活用したバースト特化アサシン。スタック処刑が気持ちいい。',tags:['ASSASSIN','AD','BURST','STEALTH']}
+      ],comment:'孤立した敵を1v1で仕留めるスタイルが理想なあなたに。カジックスのEvolution選択を毎試合考えるのが座学好きには最高。'},
+    hecarim:{name:'HECARIM',arch:'破滅の騎士・超高速ガンカー',
+      st:[{v:'S',k:'GANK'},{v:'S',k:'SPEED'},{v:'A',k:'ENGAGE'},{v:'B',k:'1V1'}],
+      picks:[
+        {name:'ヘカリム',desc:'移動速度がダメージに直結するという最高にクールなキット。E突撃ガンクは防ぐことがほぼ不可能。Rの集団戦エンゲージも強烈。',tags:['DIVER','SPEED','AD','EARLY']},
+        {name:'ウーコン',desc:'Rの集団戦ノックアップとクローンのだましプレイが強烈。序盤ガンク力が高くシンプルに使いやすい。',tags:['FIGHTER','CC','AD','CLONE']}
+      ],comment:'速く動き回り次々とガンクしたいあなたにはヘカリムがドンピシャ。スピードを活かして複数レーンを荒らし続ける爽快感は他では味わえない。'},
+    nocturne:{name:'NOCTURNE',arch:'永遠の悪夢・恐怖の支配者',
+      st:[{v:'S',k:'FEAR'},{v:'A',k:'GANK'},{v:'A',k:'1V1'},{v:'B',k:'TEAM'}],
+      picks:[
+        {name:'ノクターン',desc:'Rで視界を奪いながら突撃する恐怖のプレッシャーが唯一無二。Patch26.7で特に強い。「どこにいるかわからない」という敵の焦りを利用するスタイル。',tags:['DIVER','FEAR','AD','CURRENT META']},
+        {name:'シャコ',desc:'クローンと罠で敵を精神的に追い詰めるトリックスター。予測不可能な動きで相手を翻弄する唯一無二の存在。',tags:['TRICKSTER','STEALTH','AD/AP','CLONE']}
+      ],comment:'プレッシャーと恐怖で相手を支配したいあなたにノクターンは最高にフィット。Rのタイミングを磨くだけで勝率が爆発的に上がる。'},
+    viego:{name:'VIEGO',arch:'廃王・憑依キャリー',
+      st:[{v:'S',k:'CARRY'},{v:'A',k:'SCALE'},{v:'S',k:'RESET'},{v:'B',k:'EARLY'}],
+      picks:[
+        {name:'ヴィエゴ',desc:'倒した敵を一時憑依して使えるという唯一無二のキット。集団戦でのスノーボール力が異常。1キルから試合を決める爆発力がある。',tags:['CARRY','POSSESSION','RESET','AD']},
+        {name:'ケイン',desc:'2フォームを状況に合わせて選べる適応型。試合展開に合わせて変形できる唯一無二の柔軟性。',tags:['FLEXIBLE','TRANSFORM','AD','WALL PASS']}
+      ],comment:'後半にひっくり返す爆発力を求めるあなたにはヴィエゴが最適。憑依システムを理解してから急激に面白さを実感できる。'},
+    amumu:{name:'AMUMU',arch:'悲しき幽霊・CC番長',
+      st:[{v:'S',k:'CC'},{v:'S',k:'TEAM'},{v:'A',k:'SIMPLE'},{v:'B',k:'1V1'}],
+      picks:[
+        {name:'アムム',desc:'2026年でも高勝率を維持する安定タンクJG。QバンデージトスとRの大AOECCで集団戦を支配。操作がシンプルで立ち回りとマクロに集中できる。',tags:['TANK','CC','AP/AD','BEGINNER OK']},
+        {name:'マルファイト',desc:'Rのノックアップで集団戦を一発でひっくり返す。完全タンクビルドで死ににくい。',tags:['TANK','CC','AP','TEAMFIGHT']}
+      ],comment:'チームに貢献しながら安定して勝ちたいあなたにはアムムが最適解。CC量が多くてチームメイトが動きやすい状況を作れる。'},
+    mundo:{name:'DR. MUNDO',arch:'ウォーウィック博士・不死身の重戦車',
+      st:[{v:'S',k:'TANK'},{v:'S',k:'SIMPLE'},{v:'A',k:'LATE'},{v:'B',k:'GANK'}],
+      picks:[
+        {name:'ドクター・ムンド',desc:'とにかく死なない。Rの超回復で不死身に近い耐久力を発揮。クリアが安定していて操作がシンプル。JGのマクロと判断力を鍛えながら勝てる。',tags:['TANK','SUSTAIN','AD','SIMPLE']},
+        {name:'ヴォリベア',desc:'序盤のレーンへのダイブ力と集団戦の爆発力がある。ムンドより積極的なプレイスタイル向け。',tags:['DIVER','AP','DIVE','ATTACK SPEED']}
+      ],comment:'とにかく安定して勝ちを積みたいあなたにはムンドが最適解。操作の簡単さでJGのマクロと視野を鍛えながら勝てる最高の安定枠。'},
+    kayn:{name:'KAYN',arch:'影の刈り取り手・二形態変身型',
+      st:[{v:'A',k:'FLEX'},{v:'S',k:'ROAM'},{v:'A',k:'TRANSFORM'},{v:'A',k:'SCALE'}],
+      picks:[
+        {name:'ケイン',desc:'試合状況を見てアサシン形態かドレイン形態を選べる唯一無二の柔軟性。壁抜けの機動力が魅力的でどんなコンプにも対応できる万能JG。',tags:['FLEXIBLE','TRANSFORM','AD','WALL PASS']},
+        {name:'ヴィエゴ',desc:'ケインより後半の爆発力が高い。リセット型の暴れが楽しい。',tags:['CARRY','POSSESSION','AD','RESET']}
+      ],comment:'適応力と柔軟性を重視するあなたにはケインがベストマッチ。形態選択という毎試合考える要素が戦略好きには最高に刺さる。'},
+    briar:{name:'BRIAR',arch:'血渇きの乙女・本能型アサシン',
+      st:[{v:'S',k:'CARRY'},{v:'S',k:'1V1'},{v:'A',k:'DUEL'},{v:'B',k:'CONTROL'}],
+      picks:[
+        {name:'ブライアー',desc:'Patch26.7でトップ3入りの超強力JG。血渇きの本能でHPが低い敵に猛突進するアグレッシブなスタイル。高い回復力と継続ダメージで1v1最強クラス。',tags:['DIVER','AD','SUSTAIN','CURRENT META']},
+        {name:'ナーフィリ',desc:'Hubrisバフで急上昇した現環境強キャラ。アサシンJGとして高い実力を発揮。',tags:['ASSASSIN','AD','CURRENT META','HUBRIS']}
+      ],comment:'本能的で攻撃的なスタイルが好きなあなたにはブライアーが最高にフィット。血渇きの暴走感と圧倒的な1v1強さが中毒性を持つ。'},
+    xin:{name:'XIN ZHAO',arch:'千の夜明けの槍・序盤最強JG',
+      st:[{v:'S',k:'GANK'},{v:'S',k:'EARLY'},{v:'A',k:'1V1'},{v:'A',k:'SIMPLE'}],
+      picks:[
+        {name:'シンジャオ',desc:'Patch26.7シェンと並ぶJGトップ。序盤のクリアスピードと1v1の強さが最高クラス。RのノックアウトでインベードとJGファイトを制圧する。シンプルで確実に仕事できる。',tags:['DIVER','AD','EARLY','RELIABLE']},
+        {name:'ウーコン',desc:'シンジャオより集団戦のインパクトが高い。Rのノックアップとクローンが強烈。',tags:['FIGHTER','AD','CC','CLONE']}
+      ],comment:'序盤から圧倒して試合を決めたいあなたにはシンジャオが最高の選択。シンプルで確実に仕事できるから勝率を積みやすい最強安定JG。'},
+    shen:{name:'SHEN',arch:'影の護衛・グローバルJG',
+      st:[{v:'A',k:'GLOBAL'},{v:'S',k:'TANK'},{v:'A',k:'GANK'},{v:'S',k:'UTILITY'}],
+      picks:[
+        {name:'シェン',desc:'全マップR護衛でどこにいても味方を助けられる特殊JG。タンクとして集団戦にも強い。マクロとグローバルプレイが好きな人に最高にフィット。',tags:['TANK','GLOBAL','SPLIT','UTILITY']},
+        {name:'アムム',desc:'シェンよりCCが強くシンプルに機能する。タンクJGとして確実に仕事できる。',tags:['TANK','CC','SIMPLE','RELIABLE']}
+      ],comment:'グローバルプレイでマップ全体に影響したいあなたにはシェンJGが最高の選択。Rで味方を助けた時の爽快感は他のJGでは味わえない。'},
+    graves:{name:'GRAVES',arch:'無法者の散弾銃・近距離ADCジャングラー',
+      st:[{v:'A',k:'CLEAR'},{v:'A',k:'1V1'},{v:'A',k:'AD'},{v:'B',k:'GANK'}],
+      picks:[
+        {name:'グレイブス',desc:'散弾銃ショットガンの近距離AD型JG。高速クリアとキャンプ荒らしが得意。Patch26.7ではナーフされたが依然として強力。',tags:['MARKSMAN','AD','CLEAR','INVADE']},
+        {name:'ケイン',desc:'グレイブスよりフォーム選択の柔軟性が高い。アサシン形態はグレイブスと似たスタイル。',tags:['FLEXIBLE','AD','TRANSFORM','WALL PASS']}
+      ],comment:'近距離ADの爆発的なダメージでキャンプを荒らすスタイルが好きなあなたにはグレイブスが最高。高速クリアでリードを作るスタイルが楽しい。'},
+    evelynn:{name:'EVELYNN',arch:'苦悶の化身・ステルスアサシン',
+      st:[{v:'S',k:'STEALTH'},{v:'S',k:'KILL'},{v:'B',k:'EARLY'},{v:'S',k:'LATE'}],
+      picks:[
+        {name:'エリス',desc:'レベル6以降ステルスで永続隠形できる唯一無二のアサシン。後半の瞬殺力と逃走力は全JG中最高クラス。ステルスによる読めないプレイが楽しい。',tags:['ASSASSIN','AP','STEALTH','HIGH SKILL']},
+        {name:'シャコ',desc:'エリスと同じくステルス活用型。罠とクローンでより複雑なだましプレイができる。',tags:['TRICKSTER','STEALTH','AD/AP','CLONE']}
+      ],comment:'ステルスで相手の盲点を突くトリッキーなスタイルが好きなあなたにはエリスが最高。永続隠形という圧倒的なプレッシャーが中毒性を持つ。'},
+    volibear:{name:'VOLIBEAR',arch:'雷の怒り・ダイブ特化バーサーカー',
+      st:[{v:'A',k:'DIVE'},{v:'A',k:'TOWER'},{v:'A',k:'GANK'},{v:'B',k:'TEAM'}],
+      picks:[
+        {name:'ヴォリベア',desc:'Rで雷を呼びタワーを無効化しながらダイブする特殊なシステムが唯一無二。序盤のレーンへのダイブ力が高く、攻撃速度が上がるほど強くなる。',tags:['DIVER','AP','TOWER DIVE','ATTACK SPEED']},
+        {name:'ブライアー',desc:'ヴォリベアよりも1v1の強さが高い。同じく攻撃的なダイバー系。',tags:['DIVER','AD','SUSTAIN','CURRENT META']}
+      ],comment:'タワーダイブとガンクで積極的に攻めたいあなたにはヴォリベアが最高にフィット。Rでタワーを無効化しながら突っ込む瞬間の爽快感は唯一無二。'},
+    rekSai:{name:"REK'SAI",arch:'空虚の女王・トンネル機動型',
+      st:[{v:'A',k:'CLEAR'},{v:'A',k:'GANK'},{v:'A',k:'MAP'},{v:'B',k:'SKILL'}],
+      picks:[
+        {name:'レクサイ',desc:'トンネルネットワークによる超高速マップ移動が唯一無二。どこにでも高速で現れるプレッシャーが最高。攻撃的でシンプルなダイバー。',tags:['DIVER','AD','TUNNEL','MAP CONTROL']},
+        {name:'ヘカリム',desc:'レクサイと同じく超高速移動が武器のJG。よりシンプルで使いやすい。',tags:['DIVER','AD','SPEED','EARLY']}
+      ],comment:'マップ全体を素早く動き回るスタイルが好きなあなたにはレクサイが最高。トンネルネットワークを使いこなせばマップの神になれる。'},
+    naafiri:{name:'NAAFIRI',arch:'ダーキン猟犬・パックアサシン',
+      st:[{v:'S',k:'CURRENT'},{v:'A',k:'PACK'},{v:'A',k:'ASSASSIN'},{v:'B',k:'SCALE'}],
+      picks:[
+        {name:'ナーフィリ',desc:'Hubrisバフで2026年JGトップ3入り。犬の群れとともに戦う唯一無二のアサシン。シンプルなキットだが爆発的なキルプレッシャーを持つ。',tags:['ASSASSIN','AD','CURRENT META','PACK']},
+        {name:'ブライアー',desc:'ナーフィリと同じく現環境最強アサシン系JG。1v1強度が異常に高い。',tags:['DIVER','AD','SUSTAIN','CURRENT META']}
+      ],comment:'現環境最強を使いたいあなたにはナーフィリが最高の選択。犬の群れで突撃する独特のスタイルと高い殺傷力が気持ちいい。'},
+    nidalee:{name:'NIDALEE',arch:'野生の狩人・高難度スキルショットJG',
+      st:[{v:'S',k:'SKILL'},{v:'S',k:'CLEAR'},{v:'A',k:'GANK'},{v:'C',k:'EASY'}],
+      picks:[
+        {name:'ニダリー',desc:'槍を当てれば当てるほど強くなる超高難度スキルショット型JG。高速クリアとダメージトレードのうまさが勝率に直結。プロプレイヤーが好む職人チャンプ。',tags:['JUNGLER','AP/AD','HIGH SKILL','SPEAR']},
+        {name:'カジックス',desc:'ニダリーよりシンプルに高い殺傷力を持つアサシン。Evolutionシステムが戦略好きに刺さる。',tags:['ASSASSIN','AD','EVOLUTION','ISOLATE']}
+      ],comment:'超高難度を求める座学の鬼なあなたにはニダリーが究極の挑戦。槍精度を極めた時の強さはJG随一。プロレベルのクリアスピードを目指せるチャンプ。'},
+    shaco:{name:'SHACO',arch:'悪魔の道化師・精神的戦慄',
+      st:[{v:'S',k:'TRICK'},{v:'S',k:'SPLIT'},{v:'A',k:'FEAR'},{v:'B',k:'TEAM'}],
+      picks:[
+        {name:'シャコ',desc:'クローンと罠で敵を精神的に追い詰めるトリックスター。予測不可能な動きで相手JGを完全に翻弄する唯一無二の存在。相手が混乱してミスを誘発する。',tags:['TRICKSTER','STEALTH','AD/AP','CLONE']},
+        {name:'ノクターン',desc:'シャコと同じく恐怖プレッシャー系。よりシンプルに機能する。',tags:['DIVER','FEAR','AD','CURRENT META']}
+      ],comment:'トリッキーで予測不可能なプレイが好きなあなたにはシャコが最高に刺さる。クローン操作を極めると相手が完全に混乱して勝手にミスしてくれる。'},
+    sejuani:{name:'SEJUANI',arch:'冬の怒り・タンクCC特化',
+      st:[{v:'S',k:'CC'},{v:'S',k:'TANK'},{v:'A',k:'TEAM'},{v:'B',k:'CARRY'}],
+      picks:[
+        {name:'セジュアニ',desc:'Q突撃とRのグローバルCCで集団戦を支配するタンクJG。チームにとって必要なCCを安定供給できる。Rのロングレンジチャームが決まった時の達成感がある。',tags:['TANK','CC','ENGAGE','RELIABLE']},
+        {name:'アムム',desc:'セジュアニと同じくCC特化タンク。よりシンプルに機能する。',tags:['TANK','CC','SIMPLE','RELIABLE']}
+      ],comment:'タンクCCとして安定してチームを支えたいあなたにはセジュアニが完璧。ロングレンジRが刺さった瞬間の達成感は格別。'},
+    jarvanIV:{name:'JARVAN IV',arch:'デマーシアの王太子・エリートJG',
+      st:[{v:'A',k:'ENGAGE'},{v:'A',k:'RELIABLE'},{v:'A',k:'GANK'},{v:'A',k:'TEAM'}],
+      picks:[
+        {name:'ジャーバン IV',desc:'Q→Eフラッグコンボで確実にエンゲージできるオールラウンダー。RのアリーナCCが集団戦を決定づける。バランスよく全フェーズで機能する。',tags:['DIVER','AD','CC','RELIABLE']},
+        {name:'シンジャオ',desc:'ジャーバンと同じく序盤が強いオールラウンダー。よりシンプルに1v1を制圧できる。',tags:['DIVER','AD','EARLY','SIMPLE']}
+      ],comment:'バランスよく全フェーズで機能するオールラウンダーが欲しいあなたにはジャーバンが最高の選択。確実に仕事できる安定感と集団戦インパクトを両立できる。'},
+    taliyah:{name:'TALIYAH',arch:'石を砕く少女・テレインコントロールJG',
+      st:[{v:'A',k:'ROAM'},{v:'A',k:'TERRAIN'},{v:'B',k:'1V1'},{v:'A',k:'SPECIAL'}],
+      picks:[
+        {name:'タリヤ',desc:'壁と地形コントロールで独特のプレイメイクができるAP JG。Rのストーンウィーバーで高速ローム。スキルショット精度とポジショニング理解が必要な職人チャンプ。',tags:['MAGE','AP','TERRAIN','HIGH SKILL']},
+        {name:'ニダリー',desc:'タリヤと同じく高スキルAP JG。よりスピード重視のスタイル。',tags:['JUNGLER','AP/AD','HIGH SKILL','SPEAR']}
+      ],comment:'独自の地形コントロールとローム力で試合を動かしたいあなたにはタリヤが最高にフィット。壁操作を完璧に習得した時の戦術的面白さは唯一無二。'},
+    fizz:{name:'FIZZ',arch:'魚の殺し屋・AP突撃アサシン',
+      st:[{v:'A',k:'GANK'},{v:'A',k:'BURST'},{v:'A',k:'MOBILE'},{v:'B',k:'TEAM'}],
+      picks:[
+        {name:'フィズ',desc:'Eのポールジャンプで物理的に接触を断てる強力なサバイバルツールを持つAP JG。Rのサメで瞬殺するスタイルが爽快。ガンク時の機動力が高い。',tags:['ASSASSIN','AP','MOBILE','BURST']},
+        {name:'エリス',desc:'フィズより後半の安定したアサシンパワーを持つ。ステルスで読めないプレイができる。',tags:['ASSASSIN','AP','STEALTH','HIGH SKILL']}
+      ],comment:'AP爆発力と機動力でガンクと集団戦どちらも楽しみたいあなたにはフィズが最高。サメRで瞬殺した時の爽快感は格別。'},
+    karthus:{name:'KARTHUS',arch:'死の詠唱者・全マップR処刑者',
+      st:[{v:'A',k:'GLOBAL'},{v:'S',k:'LATE'},{v:'B',k:'GANK'},{v:'S',k:'R'}],
+      picks:[
+        {name:'カーサス',desc:'全マップRで誰でも処刑できるという唯一無二のパッシブ＆R。クリアは遅めだが後半の集団戦への影響力は全JG中最高クラス。R精度を磨くほど味方から感謝される。',tags:['MAGE','AP','GLOBAL R','LATE GAME']},
+        {name:'ヴィエゴ',desc:'カーサスより動的な集団戦影響力を持つ。リセット型の楽しさがある。',tags:['CARRY','AP','POSSESSION','RESET']}
+      ],comment:'後半に全マップで影響を与えたいあなたにはカーサスが唯一無二の選択。Rで逃げる敵を追いかけて処刑した時の快感は他では味わえない。'}
+  },
+  calc(A){
+    const s={leeSin:0,khazix:0,hecarim:0,nocturne:0,viego:0,amumu:0,mundo:0,kayn:0,briar:0,xin:0,shen:0,graves:0,evelynn:0,volibear:0,rekSai:0,naafiri:0,nidalee:0,shaco:0,sejuani:0,jarvanIV:0,taliyah:0,fizz:0,karthus:0};
+    if(A[0]==='gank'){s.leeSin+=3;s.hecarim+=3;s.xin+=2;s.nocturne+=1;}
+    if(A[0]==='farm'){s.viego+=2;s.kayn+=2;s.mundo+=2;s.karthus+=2;}
+    if(A[0]==='invade'){s.khazix+=3;s.leeSin+=2;s.graves+=2;}
+    if(A[0]==='obj'){s.hecarim+=2;s.amumu+=2;s.sejuani+=2;}
+    if(A[1]==='engage'){s.hecarim+=3;s.amumu+=3;s.sejuani+=3;s.xin+=1;}
+    if(A[1]==='assassin'){s.khazix+=3;s.nocturne+=2;s.naafiri+=2;s.evelynn+=2;}
+    if(A[1]==='fighter'){s.viego+=3;s.kayn+=2;s.briar+=2;}
+    if(A[1]==='special'){s.viego+=2;s.shaco+=2;s.taliyah+=2;s.karthus+=1;}
+    if(A[2]==='win'){s.khazix+=2;s.leeSin+=2;s.briar+=2;s.xin+=1;}
+    if(A[2]==='avoid'){s.nocturne+=2;s.kayn+=2;s.evelynn+=2;}
+    if(A[2]==='team'){s.amumu+=3;s.hecarim+=2;s.mundo+=2;s.sejuani+=2;}
+    if(A[3]==='hard'){s.leeSin+=2;s.hecarim+=2;s.rekSai+=1;}
+    if(A[3]==='cc'){s.amumu+=3;s.sejuani+=3;s.hecarim+=1;}
+    if(A[3]==='stealth'){s.nocturne+=3;s.khazix+=2;s.evelynn+=2;s.shaco+=2;}
+    if(A[3]==='teamfight'){s.viego+=2;s.mundo+=2;s.karthus+=2;s.amumu+=1;}
+    if(A[4]==='easy'){s.mundo+=3;s.amumu+=3;s.xin+=2;s.nocturne+=2;}
+    if(A[4]==='mid'){s.viego+=2;s.kayn+=3;s.nocturne+=2;s.naafiri+=2;}
+    if(A[4]==='hard'){s.leeSin+=3;s.khazix+=2;s.nidalee+=3;s.taliyah+=2;}
+    if(A[5]==='early'){s.leeSin+=2;s.hecarim+=2;s.khazix+=2;s.xin+=2;s.briar+=2;}
+    if(A[5]==='late'){s.viego+=3;s.kayn+=2;s.karthus+=3;s.evelynn+=2;}
+    if(A[5]==='all'){s.nocturne+=2;s.mundo+=2;s.amumu+=1;s.naafiri+=1;}
+    if(A[6]==='kill'){s.khazix+=3;s.nocturne+=2;s.naafiri+=2;s.evelynn+=2;}
+    if(A[6]==='save'){s.leeSin+=3;s.viego+=2;s.shen+=2;}
+    if(A[6]==='fear'){s.nocturne+=3;s.hecarim+=2;s.shaco+=2;}
+    if(A[6]==='control'){s.amumu+=2;s.mundo+=2;s.sejuani+=2;s.karthus+=1;}
+    if(A[7]==='active'){s.leeSin+=2;s.hecarim+=2;s.rekSai+=2;}
+    if(A[7]==='hunter'){s.khazix+=3;s.nocturne+=2;s.kayn+=1;s.evelynn+=2;}
+    if(A[7]==='tank'){s.amumu+=2;s.mundo+=3;s.sejuani+=2;}
+    if(A[7]==='scaler'){s.viego+=3;s.kayn+=2;s.karthus+=2;}
+    if(A[8]==='special'){s.viego+=2;s.kayn+=2;s.shaco+=2;s.taliyah+=1;}
+    if(A[8]==='simple'){s.xin+=2;s.amumu+=2;s.mundo+=2;s.nocturne+=1;}
+    if(A[8]==='stack'){s.briar+=2;s.graves+=2;s.karthus+=1;}
+    if(A[9]==='carry'){s.leeSin+=2;s.viego+=2;s.briar+=2;s.naafiri+=1;}
+    if(A[9]==='util'){s.amumu+=3;s.sejuani+=2;s.shen+=2;}
+    if(A[9]==='macro'){s.shen+=3;s.rekSai+=2;s.taliyah+=2;s.karthus+=1;}
+    if(A[9]==='speed'){s.hecarim+=3;s.rekSai+=2;s.nidalee+=2;}
+    return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+};
+
+// ============================================================
+// MID LANE — 24 champs, 10 questions
+// ============================================================
+
+var MID={
+  label:'MID LANE',color:'#4a9fe8',
+  qs:[
+    {q:'レーン戦はどんなスタイルで戦いたい？',o:[{e:'💥',t:'バーストで対面を瞬殺、序盤からキルプレッシャー',v:'burst'},{e:'🏹',t:'遠距離ポークで安全に削ってリードを広げる',v:'poke'},{e:'🌱',t:'ファーム重視でスケール、後半に真価を発揮',v:'scale'},{e:'🗺️',t:'レーンを素早く処理してローム、マップへの影響を重視',v:'roam'}]},
+    {q:'集団戦での理想の役割は？',o:[{e:'⚡',t:'後衛に飛び込んでキャリーを瞬殺するアサシン',v:'assassin'},{e:'💫',t:'AOEスキルで複数を巻き込む大火力キャリー',v:'aoe'},{e:'🔮',t:'特殊なキットで試合を変える役',v:'special'},{e:'🛡️',t:'CCと機動力でチームをコントロールする役',v:'control'}]},
+    {q:'ソロキル力はどのくらい求める？',o:[{e:'☠️',t:'序盤からソロキルを量産してレーンを支配したい',v:'kill'},{e:'⚖️',t:'有利を積み重ねてスノーボールしたい',v:'adv'},{e:'🔄',t:'ローム先でのキルを狙いたい',v:'roam'}]},
+    {q:'好みのダメージタイプは？',o:[{e:'🗡️',t:'ADフィジカル系',v:'ad'},{e:'✨',t:'APマジック系',v:'ap'},{e:'⚡',t:'どちらでも強ければOK',v:'any'}]},
+    {q:'難易度の好みは？',o:[{e:'😌',t:'シンプルで使いやすければOK',v:'easy'},{e:'🎮',t:'中難易度',v:'mid'},{e:'🔥',t:'超高難易度でも天井が高いやつ',v:'hard'}]},
+    {q:'ゲームへの影響タイミングは？',o:[{e:'🌅',t:'序盤スノーボールでゲームを早く決めたい',v:'early'},{e:'🌙',t:'後半スケールで逆転したい',v:'late'},{e:'♾️',t:'常に安定して強いやつがいい',v:'all'}]},
+    {q:'好きなキャラの雰囲気は？',o:[{e:'👾',t:'ダークでクールなヴィランタイプ',v:'dark'},{e:'🔮',t:'謎めいた魔法使い・魔導士タイプ',v:'mage'},{e:'⚡',t:'スピードとトリッキーさがある俊敏タイプ',v:'tricky'},{e:'🌊',t:'圧倒的な存在感・スケール型の大きなキャラ',v:'epic'}]},
+    {q:'スキルショットへのこだわりは？',o:[{e:'🎯',t:'スキルショット命！当てるか当てないかで全て決まる',v:'heavy'},{e:'⚖️',t:'スキルショットも通常攻撃も両方',v:'balance'},{e:'🎮',t:'ターゲット指定が多いシンプルなキットが好き',v:'target'}]},
+    {q:'マクロとローム、どちらが好き？',o:[{e:'🗺️',t:'ローム最優先！サイドレーンに暗殺しに行く',v:'roam'},{e:'🏠',t:'レーンを極力離れず対面を倒し続けたい',v:'lane'},{e:'🔄',t:'状況に応じて柔軟に動ける',v:'flex'}]},
+    {q:'MIDレーナーとして最も大事なことは？',o:[{e:'💎',t:'スキルショット精度、当てるか当てないかで全て決まる',v:'skill'},{e:'🧠',t:'コンボと深いキット理解',v:'combo'},{e:'⚡',t:'爆発的なダメージで相手が何もできない状態を作る',v:'damage'},{e:'🌍',t:'マクロとビジョン、マップ全体への影響力',v:'macro'}]}
+  ],
+  ch:{
+    ahri:{name:'AHRI',arch:'九尾の狐・万能コントロールメイジ',
+      st:[{v:'S',k:'RELIABLE'},{v:'A',k:'ROAM'},{v:'A',k:'PICK'},{v:'S',k:'SAFE'}],
+      picks:[{name:'アーリ',desc:'Patch26.7Sティア。安全性・バースト・ローム力を全て高いレベルで持つ万能型。Qのチャームが当たった瞬間の快感と、Rの三連ダッシュの機動力が魅力。',tags:['MAGE','AP','SAFE','ALL-AROUND']},{name:'シンドラ',desc:'アーリより1v1のバースト力が高い。オーブ操作が上手くなるほど強くなる。',tags:['MAGE','AP','BURST','ORB']}],
+      comment:'安定して勝てるMIDが欲しいあなたにはアーリが最適解。今の環境でも確実に強く、ローム先でも貢献できるマルチロールな影響力がある。'},
+    azir:{name:'AZIR',arch:'砂の皇帝・超高難易度スケーラー',
+      st:[{v:'S+',k:'SKILL'},{v:'S',k:'LATE'},{v:'A',k:'TEAM'},{v:'C',k:'EASY'}],
+      picks:[{name:'アジール',desc:'兵士操作という唯一無二のシステムを極めれば全チャンプ最高クラスの強さ。シャッフルなどの高難度コンボが決まった時の達成感は格別。プロ御用達の超高難易度スケーラー。',tags:['CONTROL MAGE','AP','HIGH SKILL','LATE']},{name:'オレリオン・ソル',desc:'スタックが溜まれば誰も止められないハイパースケーラー。アジールより操作は楽。',tags:['MAGE','AP','SCALE','HYPERCARRY']}],
+      comment:'超高難易度でも習得後の爆発力を求めるあなたにはアジールが究極の挑戦。座学の鬼なあなたがコンボを完全習得した時の強さは別格。'},
+    orianna:{name:'ORIANNA',arch:'ゼンマイ人形・ボール支配型コントロールメイジ',
+      st:[{v:'A',k:'POKE'},{v:'S',k:'TEAMFIGHT'},{v:'A',k:'SKILL'},{v:'S',k:'RELIABLE'}],
+      picks:[{name:'オリアナ',desc:'ボール位置管理とショックウェーブRによる集団戦制圧が最高に楽しい。スキルショット精度とボール管理が直接勝率に直結する深みのあるキャラ。',tags:['CONTROL MAGE','AP','TEAMFIGHT','BALL']},{name:'ヴィクター',desc:'レーンポークが強くEデスレイで波クリアもバースト力も高い。',tags:['MAGE','AP','POKE','SIMPLE']}],
+      comment:'マクロとチームファイトを重視するあなたにはオリアナが理想。ボール管理を極めたら集団戦で誰も止められない支配感を得られる。'},
+    xerath:{name:'XERATH',arch:'魔力の化身・超長射程アーティラリー',
+      st:[{v:'S',k:'POKE'},{v:'A',k:'RANGE'},{v:'A',k:'SIMPLE'},{v:'B',k:'1V1'}],
+      picks:[{name:'ゼラス',desc:'LoL最長射程クラスのポーカー。対面に触れさせないまま一方的に削れる快感。Rの全マップ砲撃で集団戦にも貢献できる。',tags:['ARTILLERY','AP','POKE','LONG RANGE']},{name:'ヴェルコズ',desc:'スキルショット精度がより求められるが真ダメージで高火力。',tags:['ARTILLERY','AP','TRUE DAMAGE','RESEARCH']}],
+      comment:'遠距離からポークして安全に削るスタイルが好きなあなたにはゼラスが最高に向いてる。スキルショット精度が高いほど輝くチャンプで座学好きに相性抜群。'},
+    malzahar:{name:'MALZAHAR',arch:'虚空の予言者・安定コントロールメイジ',
+      st:[{v:'S',k:'SAFE'},{v:'S',k:'WAVE'},{v:'A',k:'CC'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'マルザーハール',desc:'Patch26.7Sティア。波クリアと安定性が最高クラス。Rのポイントクリック拘束でチームファイトを確実に決められる。',tags:['MAGE','AP','SIMPLE','S-TIER']},{name:'アニビア',desc:'壁と蘇生パッシブが独特な波クリア最強系。',tags:['MAGE','AP','WAVE','REBIRTH']}],
+      comment:'安定して確実に仕事するMIDが欲しいあなたにはマルザーハールが最適解。難しいことを考えずRで試合を決める快感と確実な勝率が嬉しい。'},
+    kassadin:{name:'KASSADIN',arch:'虚空の歩行者・最強レイトゲームキャリー',
+      st:[{v:'S+',k:'LATE'},{v:'C',k:'EARLY'},{v:'S',k:'SCALE'},{v:'A',k:'SKILL'}],
+      picks:[{name:'カサディン',desc:'レベル6以降Rのブリンクを連発できるようになってから本番。後半最強クラスのキャリー。',tags:['AP ASSASSIN','LATE','BLINK','HIGH SKILL']},{name:'オレリオン・ソル',desc:'スタックシステムで育てば全チャンプ最強クラスの射程と火力。',tags:['MAGE','AP','SCALE','HYPERCARRY']}],
+      comment:'後半に完全無双するスタイルを目指すあなたにはカサディンが究極の選択。Rブリンクを連発して誰も捕まえられない状態になった時の快感は格別。'},
+    leblanc:{name:'LEBLANC',arch:'誑かしの魔道士・幻影アサシン',
+      st:[{v:'S',k:'BURST'},{v:'S',k:'SKILL'},{v:'A',k:'ROAM'},{v:'B',k:'LATE'}],
+      picks:[{name:'ルブラン',desc:'LoL最高難易度クラスのAPアサシン。Faker御用達。コンボのバリエーションが無限で、使いこなせれば相手が何もできない状態を一方的に作れる。',tags:['AP ASSASSIN','HIGH SKILL','BURST','FAKER']},{name:'エコー',desc:'時間逆行Rで逆転劇が楽しい。集団戦の予測不可能な動き。',tags:['AP ASSASSIN','TIME REWIND','BURST','CARRY']}],
+      comment:'瞬殺バーストとトリッキーなムーブが好きなあなたにはルブランが最高の挑戦。Fakerも使うこのキャラの深みは底が知れない。'},
+    zed:{name:'ZED',arch:'影の帝王・ADアサシン',
+      st:[{v:'S',k:'KILL'},{v:'S',k:'ROAM'},{v:'A',k:'SKILL'},{v:'B',k:'TEAM'}],
+      picks:[{name:'ゼド',desc:'影を使ったコンボとRの瞬間移動アサシネートが最高に気持ちいい。スキル精度とコンボ理解が直接キル力に直結する。',tags:['ASSASSIN','AD','SHADOW','HIGH SKILL']},{name:'タロン',desc:'ゼドより操作がシンプル。壁飛びローム力が圧倒的。',tags:['ASSASSIN','AD','ROAM','PARKOUR']}],
+      comment:'ダークでクールなADアサシンスタイルが好きなあなたにゼドが完璧にハマる。影コンボの精度を極めた時の爽快感はLoL随一。'},
+    sylas:{name:'SYLAS',arch:'解放された者・ult強奪適応型',
+      st:[{v:'S',k:'SPECIAL'},{v:'A',k:'SUSTAIN'},{v:'A',k:'FLEX'},{v:'B',k:'EASY'}],
+      picks:[{name:'サイラス',desc:'相手のultを奪って使うというLoL唯一無二のキット。毎試合全く違う戦い方になる。',tags:['AP FIGHTER','ULT STEAL','ADAPTIVE','SPECIAL']},{name:'エコー',desc:'時間逆行Rによる逆転劇が楽しい。高いバースト力を持つ。',tags:['AP ASSASSIN','TIME REWIND','BURST','CARRY']}],
+      comment:'特殊なキットと適応性を求めるあなたにはサイラスが最高に刺さる。相手のultを奪う瞬間の高揚感は唯一無二の体験。'},
+    ekko:{name:'EKKO',arch:'ザウンの天才・時間逆行アサシン',
+      st:[{v:'A',k:'BURST'},{v:'S',k:'COMEBACK'},{v:'A',k:'SKILL'},{v:'A',k:'CARRY'}],
+      picks:[{name:'エコー',desc:'時間逆行Rで逆転劇を演出できるLoLで最もドラマチックなキット。集団戦の予測不可能な動きと高いバースト力を両立。',tags:['AP ASSASSIN','TIME REWIND','BURST','CARRY']},{name:'ヴェックス',desc:'ダッシュキャンセルパッシブで逃げ場をなくしてRで狩るスタイルが強烈。',tags:['AP ASSASSIN','BURST','ANTI-DASH','COUNTER']}],
+      comment:'逆転劇とドラマチックなプレイが好きなあなたにはエコーが完璧にハマる。Rで逃げ切った瞬間や逆転した瞬間の快感はLoL随一。'},
+    vex:{name:'VEX',arch:'憂鬱の少女・アンチダッシュアサシン',
+      st:[{v:'A',k:'BURST'},{v:'A',k:'ANTI-DASH'},{v:'A',k:'SIMPLE'},{v:'B',k:'MOBILE'}],
+      picks:[{name:'ヴェックス',desc:'ダッシュキャンセルパッシブでほぼ全ての機動型アサシンへのカウンター。Rの処刑リセットが決まった時の爽快感がある。',tags:['MAGE','AP','ANTI-DASH','SIMPLE']},{name:'リサンドラ',desc:'機動力とCCが高い。凍結チェーンと集団戦の圧倒的CCが魅力。',tags:['MAGE','AP','CC','CONTROL']}],
+      comment:'アンチダッシュで相手の動きを封じたいあなたにはヴェックスが最高。ダッシュキャンセルのタイミングを磨くほど強くなる。'},
+    lissandra:{name:'LISSANDRA',arch:'氷の魔女・CCコントロールメイジ',
+      st:[{v:'A',k:'CC'},{v:'A',k:'ROAM'},{v:'A',k:'CONTROL'},{v:'B',k:'BURST'}],
+      picks:[{name:'リサンドラ',desc:'Patch26.7でSティア維持。Qバフで旋回マシンと化した。氷結チェーンとRの全体凍結CCが集団戦を完全支配。',tags:['MAGE','AP','CC','S-TIER']},{name:'アニビア',desc:'壁と蘇生パッシブが独特。波クリアとスローが強い。',tags:['MAGE','AP','WAVE','REBIRTH']}],
+      comment:'CCで集団戦を支配するスタイルが好きなあなたにはリサンドラが最高。Q連打でローム→集団戦CCという流れが完成すれば試合を完全に支配できる。'},
+    victor:{name:'VIKTOR',arch:'機械進化の先駆者・ヘックスコアメイジ',
+      st:[{v:'A',k:'POKE'},{v:'A',k:'WAVE'},{v:'A',k:'UPGRADE'},{v:'A',k:'LATE'}],
+      picks:[{name:'ヴィクター',desc:'ヘックスコアアップグレードで強化されていくシステムが楽しい。Eデスレイのゾーニングとウェーブクリアが強力。',tags:['MAGE','AP','UPGRADE','POKE']},{name:'オリアナ',desc:'集団戦インパクトが高い。ボール管理という独自システムが面白い。',tags:['CONTROL MAGE','AP','TEAMFIGHT','BALL']}],
+      comment:'徐々に強化されていくシステムと安定したポーク力が好きなあなたにはヴィクターがドンピシャ。ヘックスコアのアップグレードを計画するのが楽しい。'},
+    syndra:{name:'SYNDRA',arch:'オーブの賢者・バースト爆発メイジ',
+      st:[{v:'A',k:'BURST'},{v:'A',k:'POKE'},{v:'A',k:'LATE'},{v:'B',k:'TEAM'}],
+      picks:[{name:'シンドラ',desc:'オーブを溜めるほど後半爆発力が上がるユニーク成長システム。Rのオーブ投球が決まった時の瞬殺バーストは最高。',tags:['MAGE','AP','BURST','ORB']},{name:'ルブラン',desc:'ローム力とコンボの多様性が高い。APアサシンとして影響力が大きい。',tags:['AP ASSASSIN','HIGH SKILL','BURST','MOBILE']}],
+      comment:'バースト爆発力とオーブ管理システムが好きなあなたにはシンドラが最高にフィット。後半の瞬殺Rは全MIDチャンプ中最高クラスの達成感。'},
+    anivia:{name:'ANIVIA',arch:'氷の不死鳥・壁使いコントロールメイジ',
+      st:[{v:'A',k:'WAVE'},{v:'A',k:'CONTROL'},{v:'S',k:'LATE'},{v:'B',k:'EARLY'}],
+      picks:[{name:'アニビア',desc:'凍結壁と蘇生パッシブというLoL最も特殊なシステムのひとつ。壁の使い方を極めると別世界が開ける。',tags:['MAGE','AP','REBIRTH','WALL']},{name:'マルザーハール',desc:'安定して機能する。波クリアとR拘束で確実に仕事できる。',tags:['MAGE','AP','SIMPLE','S-TIER']}],
+      comment:'壁コントロールと特殊システムが好きなあなたにはアニビアが最高にフィット。壁の使い方を完全習得した時のゲーム支配感は他のMIDチャンプでは味わえない。'},
+    fizz:{name:'FIZZ',arch:'海の怪物・Eブリンクアサシン',
+      st:[{v:'A',k:'BURST'},{v:'A',k:'MOBILE'},{v:'A',k:'KILL'},{v:'B',k:'TEAM'}],
+      picks:[{name:'フィズ',desc:'Eのポールジャンプで物理的に接触を断てる強力なサバイバルツール。Rのサメで瞬殺するスタイルが爽快。',tags:['ASSASSIN','AP','MOBILE','BURST']},{name:'エコー',desc:'ドラマチックな逆転劇が楽しい。Rの時間逆行で生き還る。',tags:['AP ASSASSIN','TIME REWIND','BURST','CARRY']}],
+      comment:'機動力と爆発的なバーストで相手を瞬殺するスタイルが好きなあなたにはフィズが最高。Rのサメが当たった瞬間の快感は格別。'},
+    talon:{name:'TALON',arch:'ノクサスの影・パルクールアサシン',
+      st:[{v:'A',k:'ROAM'},{v:'A',k:'BURST'},{v:'A',k:'AD'},{v:'A',k:'WALL'}],
+      picks:[{name:'タロン',desc:'壁飛びローム力が圧倒的なADアサシン。ゼドよりシンプルで高い勝率を維持。ローム→暗殺→帰還のサイクルで試合全体に影響を与える。',tags:['ASSASSIN','AD','ROAM','PARKOUR']},{name:'ゼド',desc:'タロンより難易度が高いが影コンボの爽快感は随一。',tags:['ASSASSIN','AD','SHADOW','HIGH SKILL']}],
+      comment:'ローム暗殺スタイルでマップ全体に影響したいあなたにはタロンが最高の選択。壁飛びを活かしたローム技術を磨くほど試合への影響力が増す。'},
+    corki:{name:'CORKI',arch:'チェキメイト・混合ダメージガンシップ',
+      st:[{v:'A',k:'POKE'},{v:'A',k:'AD/AP'},{v:'A',k:'PACKAGE'},{v:'B',k:'1V1'}],
+      picks:[{name:'コルキ',desc:'魔法のパッケージ配送でAD/AP混合ダメージを出す特殊なMID。Rの連射ロケットとパッケージダッシュが面白い。',tags:['MARKSMAN','AD/AP','PACKAGE','POKE']},{name:'ヴィクター',desc:'コルキよりAPに特化したポーカー。',tags:['MAGE','AP','UPGRADE','POKE']}],
+      comment:'AD/AP混合で柔軟にプレイしたいあなたにはコルキが面白い選択。パッケージ配送というユニークなシステムとどんなビルドにも対応できる柔軟性が楽しい。'},
+    veigar:{name:'VEIGAR',arch:'悪の巨人・無限スタックバースト',
+      st:[{v:'S',k:'LATE'},{v:'S',k:'BURST'},{v:'A',k:'CC'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ヴェイガー',desc:'APスタック無限成長でどこまでも強くなる唯一無二のシステム。イベントホライズンのスタンとRのバーストが後半無敵クラス。',tags:['MAGE','AP','INFINITE SCALE','BURST']},{name:'シンドラ',desc:'早期のバースト爆発力が高い。オーブシステムも成長要素がある。',tags:['MAGE','AP','BURST','ORB']}],
+      comment:'スタックを溜めながら後半に完全無双するスタイルが好きなあなたにはヴェイガーが最高。スタックが溜まっていく達成感と後半のR瞬殺バーストは中毒性がある。'},
+    ryze:{name:'RYZE',arch:'未来の守護者・ルーン魔法の達人',
+      st:[{v:'S+',k:'SKILL'},{v:'S',k:'LATE'},{v:'A',k:'TEAMFIGHT'},{v:'C',k:'EASY'}],
+      picks:[{name:'ライズ',desc:'スキルの連射コンボとルーンプリズンのCCでチームに貢献するコントロールメイジ。超高難易度だが習得後の集団戦インパクトはSキャリー級。',tags:['MAGE','AP','HIGH SKILL','TEAMFIGHT']},{name:'アジール',desc:'ライズと同じく超高難度で後半最強クラス。兵士操作が独特。',tags:['CONTROL MAGE','AP','HIGH SKILL','LATE']}],
+      comment:'超高難度で後半に最高レベルの集団戦影響力を求めるあなたにはライズが究極の挑戦。プロシーン御用達のキャラを習得した時の達成感は格別。'},
+    galio:{name:'GALIO',arch:'コロッサスの番人・グローバルタンクMID',
+      st:[{v:'S',k:'GLOBAL'},{v:'S',k:'CC'},{v:'A',k:'TANK'},{v:'A',k:'TEAMFIGHT'}],
+      picks:[{name:'ガリオ',desc:'RのグローバルCC援護は全チャンプ中最高のグローバル集団戦インパクト。マクロとグローバルプレイが好きな人に最高。',tags:['TANK','AP','GLOBAL','CC']},{name:'マルザーハール',desc:'シンプルに機能する安定MID。Rのポイントクリック拘束が確実。',tags:['MAGE','AP','SIMPLE','S-TIER']}],
+      comment:'グローバルプレイとCC集団戦を重視するあなたにはガリオが最高の選択。Rで味方のJGやADCを助けた時の達成感は格別。'},
+    aurelionSol:{name:'AURELION SOL',arch:'星の創造者・無限スケーラー',
+      st:[{v:'S+',k:'LATE'},{v:'S',k:'SCALE'},{v:'B',k:'EARLY'},{v:'S',k:'STACKS'}],
+      picks:[{name:'オレリオン・ソル',desc:'スタックが溜まれば誰も止められないハイパースケーラー。後半のAOE火力と射程は全MID最高クラス。',tags:['MAGE','AP','SCALE','HYPERCARRY']},{name:'カサディン',desc:'後半の機動力が高い。どちらも後半特化型。',tags:['AP ASSASSIN','LATE','BLINK','HIGH SKILL']}],
+      comment:'ファームしてスタックを溜めながら後半に完全無双するスタイルが好きなあなたにはオレリオン・ソルが最高。育った後の圧倒的なAOE火力は全MID中最高クラス。'},
+    yasuo:{name:'YASUO',arch:'破滅の剣士・ハイスキルAD MID',
+      st:[{v:'S',k:'SKILL'},{v:'S',k:'CARRY'},{v:'A',k:'1V1'},{v:'B',k:'EASY'}],
+      picks:[{name:'ヤスオ',desc:'LoL永遠の人気MID。ウィンドウォールとEダッシュコンボが使いこなせれば誰も止められない。上達の実感が最も分かりやすいキャラ。',tags:['FIGHTER','AD','HIGH SKILL','POPULAR']},{name:'ゼド',desc:'ヤスオより暗殺特化。影コンボの爽快感が随一。',tags:['ASSASSIN','AD','SHADOW','HIGH SKILL']}],
+      comment:'ハイスキルで上達を実感しながら強くなりたいあなたにはヤスオが唯一の選択。上手くなった瞬間が最も実感しやすいMIDを体現したようなキャラ。'}
+  },
+  calc(A){
+    const s={ahri:0,azir:0,orianna:0,xerath:0,malzahar:0,kassadin:0,leblanc:0,zed:0,sylas:0,ekko:0,vex:0,lissandra:0,victor:0,syndra:0,anivia:0,fizz:0,talon:0,corki:0,veigar:0,ryze:0,galio:0,aurelionSol:0,yasuo:0};
+    if(A[0]==='burst'){s.zed+=2;s.leblanc+=3;s.ekko+=1;s.fizz+=2;}
+    if(A[0]==='poke'){s.xerath+=3;s.orianna+=2;s.victor+=2;}
+    if(A[0]==='scale'){s.azir+=3;s.kassadin+=2;s.aurelionSol+=2;}
+    if(A[0]==='roam'){s.zed+=2;s.ahri+=2;s.talon+=3;s.sylas+=1;}
+    if(A[1]==='assassin'){s.zed+=3;s.leblanc+=2;s.ekko+=2;s.fizz+=2;s.talon+=1;}
+    if(A[1]==='aoe'){s.orianna+=3;s.azir+=2;s.xerath+=1;s.veigar+=2;}
+    if(A[1]==='special'){s.sylas+=3;s.ekko+=1;s.galio+=2;}
+    if(A[1]==='control'){s.orianna+=2;s.ahri+=2;s.lissandra+=2;s.galio+=2;}
+    if(A[2]==='kill'){s.leblanc+=2;s.zed+=2;s.ekko+=1;s.fizz+=2;}
+    if(A[2]==='adv'){s.orianna+=2;s.ahri+=2;s.azir+=1;s.veigar+=2;}
+    if(A[2]==='roam'){s.zed+=2;s.ahri+=2;s.sylas+=1;s.talon+=3;}
+    if(A[3]==='ad'){s.zed+=3;s.talon+=2;s.yasuo+=2;s.corki+=1;}
+    if(A[3]==='ap'){s.leblanc+=2;s.orianna+=2;s.azir+=2;s.sylas+=2;s.xerath+=2;s.ekko+=2;s.ahri+=2;s.veigar+=2;s.anivia+=2;}
+    if(A[3]==='any'){s.sylas+=2;s.ekko+=1;s.ahri+=1;s.corki+=2;}
+    if(A[4]==='easy'){s.ahri+=3;s.xerath+=2;s.malzahar+=3;s.veigar+=2;}
+    if(A[4]==='mid'){s.orianna+=2;s.sylas+=2;s.ekko+=2;s.lissandra+=2;s.fizz+=2;}
+    if(A[4]==='hard'){s.azir+=3;s.leblanc+=3;s.zed+=2;s.ryze+=3;s.kassadin+=2;}
+    if(A[5]==='early'){s.zed+=2;s.leblanc+=2;s.talon+=2;s.fizz+=1;}
+    if(A[5]==='late'){s.azir+=3;s.kassadin+=3;s.aurelionSol+=3;s.veigar+=2;}
+    if(A[5]==='all'){s.ahri+=2;s.orianna+=2;s.sylas+=1;s.malzahar+=2;}
+    if(A[6]==='dark'){s.zed+=3;s.leblanc+=2;s.ekko+=1;s.vex+=2;}
+    if(A[6]==='mage'){s.azir+=2;s.orianna+=2;s.xerath+=2;s.ahri+=1;s.veigar+=2;s.anivia+=2;}
+    if(A[6]==='tricky'){s.sylas+=3;s.leblanc+=2;s.ekko+=2;s.fizz+=2;}
+    if(A[6]==='epic'){s.azir+=3;s.orianna+=1;s.aurelionSol+=3;s.galio+=2;}
+    if(A[7]==='heavy'){s.xerath+=3;s.orianna+=2;s.azir+=1;s.zed+=1;}
+    if(A[7]==='balance'){s.ahri+=3;s.sylas+=2;s.corki+=2;}
+    if(A[7]==='target'){s.malzahar+=3;s.veigar+=2;s.galio+=2;}
+    if(A[8]==='roam'){s.talon+=3;s.zed+=2;s.ahri+=2;s.leblanc+=1;}
+    if(A[8]==='lane'){s.xerath+=2;s.orianna+=2;s.veigar+=2;s.anivia+=1;}
+    if(A[8]==='flex'){s.azir+=2;s.sylas+=2;s.corki+=2;s.ahri+=1;}
+    if(A[9]==='skill'){s.xerath+=3;s.orianna+=2;s.azir+=1;s.zed+=1;}
+    if(A[9]==='combo'){s.leblanc+=3;s.zed+=2;s.azir+=2;s.ryze+=2;}
+    if(A[9]==='damage'){s.zed+=2;s.ekko+=2;s.leblanc+=1;s.veigar+=2;}
+    if(A[9]==='macro'){s.ahri+=3;s.orianna+=2;s.galio+=3;s.lissandra+=2;}
+    return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+};
+
+// ============================================================
+// BOT / ADC — 24 champs, 10 questions
+// ============================================================
+
+var BOT={
+  label:'BOT / ADC',color:'#e8c43a',
+  qs:[
+    {q:'レーン戦のスタイルはどれが好み？',o:[{e:'🔫',t:'序盤から積極的にトレードして対面を倒しに行く',v:'aggressive'},{e:'🌱',t:'ファームに集中して後半スパイクで逆転する',v:'farm'},{e:'🏹',t:'遠距離ポークで相手を安全に削り続ける',v:'poke'},{e:'🔄',t:'状況に合わせて柔軟に動く',v:'flex'}]},
+    {q:'集団戦での理想の動き方は？',o:[{e:'🎯',t:'後方から安全に攻撃し続けてDPSを出す',v:'backline'},{e:'💨',t:'機動力を活かして動き回るカイト',v:'mobile'},{e:'💥',t:'バーストを溜めてから一気に爆発させる',v:'burst'},{e:'🌀',t:'特殊なメカニクスで試合を動かす',v:'special'}]},
+    {q:'カイト（移動しながら攻撃）の好み度は？',o:[{e:'💃',t:'カイトが大好き！移動しながら攻撃し続けるのが楽しい',v:'love'},{e:'😊',t:'カイトは普通にできる',v:'ok'},{e:'😤',t:'カイトより立ち止まって爆発力を出す方が好き',v:'still'}]},
+    {q:'スキルショットの比重はどのくらい欲しい？',o:[{e:'🎯',t:'スキルショット命！',v:'heavy'},{e:'⚖️',t:'スキルショットも通常攻撃も両方',v:'balance'},{e:'🤖',t:'できるだけスキルショットは少ない方がいい',v:'auto'}]},
+    {q:'どのタイミングで強くなりたい？',o:[{e:'⚡',t:'序盤から強くレーンで圧倒したい',v:'early'},{e:'🌙',t:'後半に真価を発揮するハイパーキャリーがいい',v:'late'},{e:'💥',t:'2〜3アイテムのスパイクで爆発するタイプがいい',v:'spike'}]},
+    {q:'好きなダメージスタイルは？',o:[{e:'🗡️',t:'高いADの通常攻撃で継続的にDPSを出すタイプ',v:'dps'},{e:'💥',t:'スキルで一気に爆発させるバーストダメージ',v:'burst'},{e:'☠️',t:'スタックや特殊効果が発動する独特なダメージ',v:'stack'}]},
+    {q:'ADCとして何が一番楽しい？',o:[{e:'🔫',t:'計算された処刑弾や決定的な一撃が決まる瞬間',v:'execute'},{e:'🔄',t:'リセットで連続キルを重ねていく瞬間',v:'reset'},{e:'🏹',t:'超長距離から安全に相手を削り続ける瞬間',v:'range'},{e:'⚡',t:'高速移動と機動力で相手を翻弄する瞬間',v:'speed'}]},
+    {q:'サポートとの関係性はどれが理想？',o:[{e:'🤝',t:'サポートと密接に連携して2v2で勝つ',v:'duo'},{e:'🦅',t:'サポートに頼らず自分一人でも動ける自立型',v:'solo'},{e:'🔄',t:'どちらでもいい',v:'either'}]},
+    {q:'射程の好みは？',o:[{e:'🏹',t:'最長射程！遠くから安全に攻撃したい',v:'long'},{e:'⚖️',t:'中射程、近づいたり離れたりしながら戦いたい',v:'mid'},{e:'⚔️',t:'近距離でも強いなら問題ない',v:'close'}]},
+    {q:'難易度と成長性の好みは？',o:[{e:'😌',t:'シンプルで使いやすければOK',v:'easy'},{e:'🎮',t:'中難易度、練習すれば十分使いこなせる',v:'mid'},{e:'🔥',t:'超高難易度でも習得後の天井が高いやつがいい',v:'hard'}]}
+  ],
+  ch:{
+    jinx:{name:'JINX',arch:'狂喜の放火魔・ハイパーキャリー',
+      st:[{v:'B',k:'EARLY'},{v:'S',k:'LATE'},{v:'S',k:'RESET'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ジンクス',desc:'Patch26.7ADC最高勝率クラスを維持。キルリセットで加速し続けるパッシブが最高に楽しい。エンチャンターサポートとの相性が現環境最強。',tags:['HYPERCARRY','AD','RESET','LATE']},{name:'ケイサ',desc:'進化システムで試合中にキャラクターが変わる独特のメカニクス。',tags:['CARRY','AD/AP','EVOLUTION','FLEX']}],
+      comment:'リセットで暴れ続けるハイパーキャリースタイルが好きなあなたにはジンクスが完璧。キルで加速してそのまま全員薙ぎ倒す瞬間の爽快感は最高。'},
+    kaisa:{name:"KAI'SA",arch:'虚空の子・進化適応型キャリー',
+      st:[{v:'A',k:'EARLY'},{v:'S',k:'FLEX'},{v:'A',k:'EVOLVE'},{v:'A',k:'DIVE'}],
+      picks:[{name:'ケイサ',desc:'アイテムによって三種類の進化を選べる柔軟性が強み。WスキルショットとRダイブが気持ちいい。序盤〜終盤まで安定して強い万能型。',tags:['CARRY','AD/AP','EVOLUTION','DIVE']},{name:'ジンクス',desc:'ケイサより後半の爆発力が高い。',tags:['HYPERCARRY','AD','RESET']}],
+      comment:'柔軟性と適応力を重視するあなたにはケイサが最高の相棒。進化を毎試合選べるシステムが戦略好きには刺さる。'},
+    jhin:{name:'JHIN',arch:'悪魔の芸術家・4弾処刑者',
+      st:[{v:'S',k:'EXECUTE'},{v:'A',k:'POKE'},{v:'B',k:'MOBILE'},{v:'S',k:'STYLE'}],
+      picks:[{name:'ジン',desc:'4発のリロード管理とWスネア・Rカーテンコールという計算された処刑スタイル。スキルショット精度が高いほど輝く。',tags:['MARKSMAN','AD','EXECUTE','SKILLSHOT']},{name:'ミスフォーチュン',desc:'より操作が直感的で使いやすい。',tags:['MARKSMAN','AD','BURST','SIMPLE']}],
+      comment:'計算された処刑と精密なスキルショットが好きなあなたにはジンが完璧にハマる。4発目の処刑弾が決まる瞬間の快感はADC随一。'},
+    caitlyn:{name:'CAITLYN',arch:'ピルトーバーの司法長官・最長射程マークスマン',
+      st:[{v:'S',k:'RANGE'},{v:'S',k:'POKE'},{v:'A',k:'EARLY'},{v:'B',k:'LATE'}],
+      picks:[{name:'ケイトリン',desc:'ADC最長クラスの射程でレーンを支配するポーカー。序盤からポークして相手のファームを妨害するスタイルが最高に楽しい。',tags:['MARKSMAN','AD','LONG RANGE','POKE']},{name:'ゼリ',desc:'ケイトリンより機動力が高い。高速移動と長射程を両立した独特なADC。',tags:['MARKSMAN','AD','MOBILE','AGGRESSIVE']}],
+      comment:'遠距離から安全にポークして相手を削るスタイルが好きなあなたにはケイトリンがドンピシャ。最長射程という唯一無二の武器を最大限に活かせる。'},
+    ezreal:{name:'EZREAL',arch:'放浪する冒険家・スキルショット職人',
+      st:[{v:'S',k:'SAFE'},{v:'A',k:'SKILL'},{v:'B',k:'EARLY'},{v:'A',k:'LATE'}],
+      picks:[{name:'エズリアル',desc:'QミスティックショットのスキルショットでほぼAll-in。安全なEブリンクで生存しながら戦う。スキルショット精度が全てに直結するADCの職人チャンプ。',tags:['MARKSMAN','AD','SKILLSHOT','SAFE']},{name:'ゼリ',desc:'エズリアルと同じく高機動力・スキルショット重視型。',tags:['MARKSMAN','AD','MOBILE','AGGRESSIVE']}],
+      comment:'スキルショット精度を武器にして安全にプレイしたいあなたにはエズリアルが最高。Qを当て続けるだけで強くなっていく感覚が達成感につながる。'},
+    ashe:{name:'ASHE',arch:'氷の弓使い・CCユーティリティADC',
+      st:[{v:'A',k:'CC'},{v:'S',k:'TEAM'},{v:'A',k:'VISION'},{v:'A',k:'RELIABLE'}],
+      picks:[{name:'アッシュ',desc:'Rのクリスタルアローによる全マップCC始動が強烈なユーティリティADC。視界確保とオブジェクト管理にも強い。',tags:['MARKSMAN','AD','CC','UTILITY']},{name:'ミスフォーチュン',desc:'アッシュより自分でキルを取る力が高い。',tags:['MARKSMAN','AD','BURST','TEAMFIGHT']}],
+      comment:'チームに貢献しながらプレイしたいあなたにはアッシュが完璧。RのCC始動でチームメイトを活かすプレイが上手くなるほど試合への影響力が増す。'},
+    draven:{name:'DRAVEN',arch:'栄光の処刑人・超ハイリスクハイリターン',
+      st:[{v:'S',k:'EARLY'},{v:'S',k:'KILL'},{v:'S',k:'SKILL'},{v:'C',k:'EASY'}],
+      picks:[{name:'ドレイブン',desc:'斧キャッチというLoL唯一無二のスキルシステム。序盤から圧倒的なダメージでレーンを支配するリスク最高・リターン最高のADC。',tags:['MARKSMAN','AD','HIGH SKILL','EARLY']},{name:'ルシアン',desc:'ドレイブンより難易度は低め。序盤の手数と機動力が高い。',tags:['MARKSMAN','AD','MOBILE','AGGRESSIVE']}],
+      comment:'序盤から爆発的な火力で相手を圧倒したいあなたにはドレイブンが究極の挑戦。斧キャッチを極めた時の強さは全ADC中最高クラス。'},
+    xayah:{name:'XAYAH',arch:'革命家の鳥・羽根コントロールADC',
+      st:[{v:'A',k:'SKILL'},{v:'A',k:'COMBO'},{v:'A',k:'CARRY'},{v:'A',k:'UNIQUE'}],
+      picks:[{name:'ザヤ',desc:'羽根の管理とコンボ精度が直接勝率に直結する独特なADC。Rの無敵と羽根引き戻しのコンボが決まった時の達成感が格別。',tags:['MARKSMAN','AD','FEATHER','HIGH SKILL']},{name:'ケイサ',desc:'ザヤより柔軟性が高い。',tags:['CARRY','AD/AP','EVOLUTION','FLEX']}],
+      comment:'羽根管理と独特のコンボが好きなあなたにはザヤが最高にフィット。Rで無敵になりながら羽根を一気に引き戻す瞬間の爽快感は格別。'},
+    missFortune:{name:'MISS FORTUNE',arch:'バウンティハンター・バースト爆発ADC',
+      st:[{v:'A',k:'EARLY'},{v:'A',k:'BURST'},{v:'S',k:'TEAMFIGHT'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ミスフォーチュン',desc:'Rのバレットタイムが集団戦で異常なほど強い。シンプルながら確実に仕事できる。',tags:['MARKSMAN','AD','BURST','TEAMFIGHT']},{name:'ジン',desc:'精密なスキルショットスタイル。計算された処刑が楽しい。',tags:['MARKSMAN','AD','EXECUTE','SKILLSHOT']}],
+      comment:'シンプルに集団戦で爆発したいあなたにはミスフォーチュンが完璧。Rのバレットタイムが刺さった瞬間の集団戦制圧感は格別。'},
+    kogmaw:{name:"KOG'MAW",arch:'深淵の子・射程最長DPSキャリー',
+      st:[{v:'S',k:'DPS'},{v:'S',k:'RANGE'},{v:'C',k:'MOBILITY'},{v:'S',k:'LATE'}],
+      picks:[{name:'コグマウ',desc:'W発動時の超長射程連射による継続DPSは全ADC中最高クラス。後半のホウライターとのシナジーで誰も寄れない射程から一方的に溶かせる。',tags:['MARKSMAN','AD/AP','LONG RANGE','DPS']},{name:'ジンクス',desc:'コグマウより機動力が高い。',tags:['HYPERCARRY','AD','RESET','LATE']}],
+      comment:'遠距離からDPSを出し続けるスタイルが好きなあなたにはコグマウが最高。Wの超長射程連射で誰も近づけない射程を手に入れた時の安心感と火力は格別。'},
+    nilah:{name:'NILAH',arch:'至福の享楽主義者・近接ADC',
+      st:[{v:'S',k:'UNIQUE'},{v:'A',k:'HEALER'},{v:'A',k:'CLOSE'},{v:'B',k:'RANGE'}],
+      picks:[{name:'ニラー',desc:'近接型ADCという唯一無二の立ち位置。ヒール系サポートとのシナジーで継戦力が異常に高い。Patch26.7Sティア評価。',tags:['MARKSMAN','AD','MELEE','UNIQUE']},{name:'ジンクス',desc:'ニラーより安全。',tags:['HYPERCARRY','AD','RESET','LATE']}],
+      comment:'近接ADCという超ユニークなスタイルが好きなあなたにはニラーが最高にフィット。ヒールシナジーを活かした戦い方を極めると誰も止められない。'},
+    aphelios:{name:'APHELIOS',arch:'月の武器・5武器究極高難度ADC',
+      st:[{v:'S+',k:'SKILL'},{v:'S',k:'LATE'},{v:'A',k:'CARRY'},{v:'F',k:'EASY'}],
+      picks:[{name:'アフェリオス',desc:'5種類の武器の組み合わせによる無限のビルドパスを持つLoL最高難易度ADC。習得コストは異常だが使いこなせれば全ADC中最高クラスの火力を発揮。',tags:['MARKSMAN','AD','HIGH SKILL','5 WEAPONS']},{name:'ケイサ',desc:'難易度が現実的。進化システムで十分な深みがある。',tags:['MARKSMAN','AD/AP','EVOLUTION']}],
+      comment:'超高難度を求める座学の鬼なあなたにはアフェリオスが究極の挑戦。5武器の組み合わせを完全習得した時の強さは全ADC中別次元。'},
+    smolder:{name:'SMOLDER',arch:'幼いドラゴン・スタック成長型ADC',
+      st:[{v:'A',k:'SCALE'},{v:'A',k:'POKE'},{v:'A',k:'STACK'},{v:'B',k:'EARLY'}],
+      picks:[{name:'スモルダー',desc:'スタックを溜めるほどQ強化が進化していく成長型ADC。後半のドラゴン形態は圧倒的。',tags:['MARKSMAN','AD/AP','SCALE','STACK']},{name:'ジンクス',desc:'スモルダーより後半の爆発力が高い。',tags:['HYPERCARRY','AD','RESET','LATE']}],
+      comment:'スタックを溜めながら成長していくスタイルが好きなあなたにはスモルダーが最高にフィット。後半のドラゴン形態への変化が楽しい。'},
+    lucian:{name:'LUCIAN',arch:'光銃使い・高機動ADCキャリー',
+      st:[{v:'A',k:'EARLY'},{v:'A',k:'MOBILE'},{v:'A',k:'AGGRESSIVE'},{v:'B',k:'LATE'}],
+      picks:[{name:'ルシアン',desc:'序盤の手数と機動力が高い積極的なスタイル。Eダッシュ後のパッシブ追撃コンボが気持ちいい。ナミやソラカとの組み合わせでシナジーが爆発する。',tags:['MARKSMAN','AD','MOBILE','AGGRESSIVE']},{name:'ドレイブン',desc:'ルシアンより序盤のバーストが高い。',tags:['MARKSMAN','AD','HIGH SKILL','EARLY']}],
+      comment:'機動力と積極的なトレードスタイルが好きなあなたにはルシアンが最高。Eダッシュコンボを磨いてパッシブ追撃を正確に出せると全ADC中最高の序盤圧力を持てる。'},
+    zeri:{name:'ZERI',arch:'ザウンの活力・超高速機動ADC',
+      st:[{v:'A',k:'MOBILE'},{v:'A',k:'SPEED'},{v:'A',k:'SKILL'},{v:'B',k:'EARLY'}],
+      picks:[{name:'ゼリ',desc:'壁を滑走できる独特の機動力と高速移動が特徴。Q通常攻撃がスキルショットというユニークなシステム。',tags:['MARKSMAN','AD','MOBILE','WALL SLIDE']},{name:'エズリアル',desc:'ゼリより安全で安定したスキルショット型ADC。',tags:['MARKSMAN','AD','SKILLSHOT','SAFE']}],
+      comment:'超高速機動力と独特のスキルショット通常攻撃が好きなあなたにはゼリが最高にフィット。壁滑走を活用したカイトを完璧に習得した時の爽快感は格別。'},
+    kalista:{name:'KALISTA',arch:'復讐の槍・スタック&リコイル型ADC',
+      st:[{v:'S',k:'SKILL'},{v:'S',k:'MOBILITY'},{v:'A',k:'STACK'},{v:'C',k:'EASY'}],
+      picks:[{name:'カリスタ',desc:'攻撃のたびに自動でホップするという唯一無二の移動システム。難しいが上手い人が使うと誰も追いつけない。',tags:['MARKSMAN','AD','HIGH SKILL','MOBILITY']},{name:'ケイサ',desc:'カリスタより使いやすく柔軟性が高い。',tags:['CARRY','AD/AP','EVOLUTION','FLEX']}],
+      comment:'超高難度の機動力特化ADCを求めるあなたにはカリスタが究極の挑戦。ホップシステムを完全習得した時の機動力は全ADC中別次元。'},
+    tristana:{name:'TRISTANA',arch:'鉄の大砲乙女・ロケットジャンプキャリー',
+      st:[{v:'A',k:'RESET'},{v:'A',k:'DIVE'},{v:'A',k:'LATE'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'トリスタナ',desc:'Eスタックとロケットジャンプのコンボが爽快。キルリセットでジャンプしながら連続キルできる。射程が伸び続けるという独特の成長システムも面白い。',tags:['MARKSMAN','AD','RESET','SCALING']},{name:'ジンクス',desc:'トリスタナと同じくリセット型。',tags:['HYPERCARRY','AD','RESET','LATE']}],
+      comment:'リセットジャンプと成長する射程が好きなあなたにはトリスタナが最高。Eスタックからの爆発とキルリセットジャンプの爽快感がある。'},
+    sivir:{name:'SIVIR',arch:'戦場の女王・ウェーブクリアADC',
+      st:[{v:'S',k:'WAVE'},{v:'A',k:'SPEED'},{v:'A',k:'TEAMFIGHT'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'シヴィア',desc:'ウェーブクリアが全ADC中最強クラス。Rの全体移動速度バフで集団戦を先手で仕掛けられる。スペルシールドで安全確保もできる万能型。',tags:['MARKSMAN','AD','WAVE CLEAR','SPEED']},{name:'ミスフォーチュン',desc:'シヴィアより集団戦の爆発力が高い。',tags:['MARKSMAN','AD','BURST','TEAMFIGHT']}],
+      comment:'ウェーブクリアと集団戦速度バフで試合をコントロールしたいあなたにはシヴィアが最高。全ADC中最強のウェーブクリアでマクロを有利に進める楽しさがある。'},
+    varus:{name:'VARUS',arch:'復讐の矢・AP/ADハイブリッドADC',
+      st:[{v:'A',k:'POKE'},{v:'A',k:'CC'},{v:'A',k:'HYBRID'},{v:'A',k:'RANGE'}],
+      picks:[{name:'ヴァルス',desc:'Qの長射程チャージショットとRの感染型バインディングCCが特徴的。APとADの両方のビルドが機能する柔軟性がある。',tags:['MARKSMAN','AD/AP','POKE','CC']},{name:'ケイトリン',desc:'ヴァルスより安定した長射程。',tags:['MARKSMAN','AD','LONG RANGE','POKE']}],
+      comment:'CC付きポーカーとハイブリッドビルドが好きなあなたにはヴァルスが面白い選択。RのCC感染がうまく繋がった時のチームが沸く瞬間がある。'},
+    twistFate:{name:'TWISTED FATE',arch:'カードの達人・グローバルADC',
+      st:[{v:'A',k:'GLOBAL'},{v:'A',k:'PICK'},{v:'A',k:'CC'},{v:'B',k:'DPS'}],
+      picks:[{name:'ツイステッドフェイト',desc:'全マップRワープでどこにでも現れるグローバルプレイが最高に楽しい。ゴールドカードのスタンとパッシブのゴールド収集が独特。',tags:['MARKSMAN','AD/AP','GLOBAL','PICK']},{name:'コルキ',desc:'TFと同じくAD/AP混合型。',tags:['MARKSMAN','AD/AP','PACKAGE','POKE']}],
+      comment:'グローバルプレイとローム力でマップ全体に影響したいあなたにはTFが最高の選択。Rワープで予想外の場所に現れた時の驚きと、ゴールドカードが決まった時の快感がある。'}
+  },
+  calc(A){
+    const s={jinx:0,kaisa:0,jhin:0,caitlyn:0,ezreal:0,ashe:0,draven:0,xayah:0,missFortune:0,kogmaw:0,nilah:0,aphelios:0,smolder:0,lucian:0,zeri:0,kalista:0,tristana:0,sivir:0,varus:0,twistFate:0};
+    if(A[0]==='aggressive'){s.draven+=3;s.lucian+=2;s.caitlyn+=1;}
+    if(A[0]==='farm'){s.jinx+=2;s.ezreal+=1;s.smolder+=2;}
+    if(A[0]==='poke'){s.caitlyn+=3;s.jhin+=2;s.varus+=2;s.kogmaw+=1;}
+    if(A[0]==='flex'){s.kaisa+=2;s.ezreal+=2;s.sivir+=2;}
+    if(A[1]==='backline'){s.jhin+=2;s.ashe+=2;s.caitlyn+=2;s.kogmaw+=2;}
+    if(A[1]==='mobile'){s.ezreal+=3;s.kaisa+=2;s.zeri+=2;s.kalista+=2;}
+    if(A[1]==='burst'){s.jinx+=2;s.draven+=2;s.missFortune+=2;}
+    if(A[1]==='special'){s.aphelios+=3;s.ashe+=2;s.nilah+=2;}
+    if(A[2]==='love'){s.ezreal+=3;s.kaisa+=2;s.jinx+=1;s.kalista+=2;s.zeri+=2;}
+    if(A[2]==='ok'){s.jhin+=2;s.caitlyn+=2;s.ashe+=1;s.sivir+=2;}
+    if(A[2]==='still'){s.draven+=3;s.jinx+=2;s.missFortune+=2;s.kogmaw+=2;}
+    if(A[3]==='heavy'){s.jhin+=3;s.ezreal+=2;s.caitlyn+=1;s.varus+=2;}
+    if(A[3]==='balance'){s.kaisa+=2;s.ashe+=2;s.xayah+=2;s.tristana+=1;}
+    if(A[3]==='auto'){s.jinx+=2;s.draven+=2;s.missFortune+=2;s.sivir+=2;}
+    if(A[4]==='early'){s.draven+=3;s.caitlyn+=2;s.lucian+=2;}
+    if(A[4]==='late'){s.jinx+=3;s.aphelios+=2;s.kogmaw+=2;s.smolder+=2;}
+    if(A[4]==='spike'){s.kaisa+=3;s.ezreal+=2;s.jhin+=1;s.xayah+=2;}
+    if(A[5]==='dps'){s.jinx+=2;s.ashe+=2;s.caitlyn+=1;s.kogmaw+=3;}
+    if(A[5]==='burst'){s.draven+=2;s.jhin+=2;s.kaisa+=1;s.missFortune+=2;}
+    if(A[5]==='stack'){s.aphelios+=3;s.kaisa+=2;s.smolder+=2;s.xayah+=2;}
+    if(A[6]==='execute'){s.jhin+=3;s.draven+=2;s.tristana+=2;}
+    if(A[6]==='reset'){s.jinx+=3;s.kaisa+=1;s.tristana+=2;}
+    if(A[6]==='range'){s.caitlyn+=3;s.ashe+=2;s.kogmaw+=2;s.varus+=1;}
+    if(A[6]==='speed'){s.ezreal+=3;s.kaisa+=2;s.zeri+=2;s.kalista+=2;}
+    if(A[7]==='duo'){s.ashe+=2;s.jhin+=2;s.caitlyn+=1;s.xayah+=2;}
+    if(A[7]==='solo'){s.ezreal+=3;s.draven+=2;s.kaisa+=1;s.sivir+=1;}
+    if(A[7]==='either'){s.jinx+=2;s.aphelios+=1;s.kaisa+=1;s.missFortune+=1;}
+    if(A[8]==='long'){s.caitlyn+=3;s.ashe+=2;s.kogmaw+=3;s.varus+=2;}
+    if(A[8]==='mid'){s.jinx+=2;s.jhin+=2;s.ezreal+=2;s.kaisa+=1;}
+    if(A[8]==='close'){s.nilah+=3;s.lucian+=2;s.draven+=2;s.kalista+=1;}
+    if(A[9]==='easy'){s.jinx+=3;s.ashe+=2;s.missFortune+=2;s.sivir+=2;}
+    if(A[9]==='mid'){s.kaisa+=2;s.jhin+=2;s.xayah+=2;s.tristana+=2;}
+    if(A[9]==='hard'){s.aphelios+=3;s.kalista+=3;s.draven+=2;s.zeri+=2;}
+    return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+};
+
+// ============================================================
+// SUPPORT — 24 champs, 10 questions
+// ============================================================
+
+var SUP={
+  label:'SUPPORT',color:'#b04ae8',
+  qs:[
+    {q:'サポートとして何が一番好き？',o:[{e:'💥',t:'自分でエンゲージして試合を動かすのが好き',v:'engage'},{e:'💚',t:'ADCやチームメイトを守ってヒールするのが好き',v:'heal'},{e:'🧠',t:'CCや視界管理でゲームをコントロールするのが好き',v:'control'},{e:'⚡',t:'自分でキルを取って威圧するのが好き',v:'kill'}]},
+    {q:'レーン戦スタイルはどれが理想？',o:[{e:'👊',t:'序盤からトレードして相手を圧倒する積極的スタイル',v:'aggressive'},{e:'🛡️',t:'ADCを守りながら安全にファームを通す守備的スタイル',v:'defensive'},{e:'👁️',t:'視界とCCで状況を読み、チャンスに全力を出すスタイル',v:'vision'}]},
+    {q:'集団戦での役割は？',o:[{e:'🚀',t:'最前線でエンゲージ、チームを引っ張る',v:'front'},{e:'🧙',t:'後方からCC・ヒールでチームを支援する',v:'back'},{e:'🌀',t:'特殊なスキルで予測不可能なプレイメイクをする',v:'special'}]},
+    {q:'ADCとの関係性はどれが理想？',o:[{e:'🤝',t:'ADCと密接に連携して2v2で勝つ',v:'duo'},{e:'🗺️',t:'ADCよりも積極的にローム、マップへの影響を重視',v:'roam'},{e:'💪',t:'自分がキャリーする気概でADCを盛り立てたい',v:'carry'}]},
+    {q:'難易度の好みは？',o:[{e:'😌',t:'シンプルで直感的に仕事できるチャンプがいい',v:'easy'},{e:'🎮',t:'中難易度',v:'mid'},{e:'🔥',t:'超高難易度でも習得後の影響力が高いやつ',v:'hard'}]},
+    {q:'CCの好みは？',o:[{e:'🔒',t:'強力なハードCCで確実に相手を止めたい',v:'hardcc'},{e:'🌊',t:'スロウやシールドなど柔らかいユーティリティが好き',v:'softcc'},{e:'⚡',t:'CCより自分のダメージや特殊効果で貢献したい',v:'damage'}]},
+    {q:'プレイしていて最も楽しい瞬間は？',o:[{e:'🎣',t:'フックやCCで相手を捕まえてキルを作る瞬間',v:'hook'},{e:'💚',t:'チームメイトがピンチの時に助けて感謝される瞬間',v:'save'},{e:'🔮',t:'視界管理と予測でゲームの流れをコントロールする瞬間',v:'vision'},{e:'💥',t:'集団戦開始の瞬間に全員を巻き込む大エンゲージ',v:'engage'}]},
+    {q:'どんなサポートになりたい？',o:[{e:'🦁',t:'積極的・試合の流れを自分で作るプレイメイカー',v:'playmaker'},{e:'🏥',t:'味方を守ることに徹するヒーラー・プロテクター',v:'protector'},{e:'🕵️',t:'視界とマクロで試合全体をコントロールするストラテジスト',v:'strategist'},{e:'⚡',t:'自分でも十分なダメージを出せるセミキャリーサポート',v:'semicarry'}]},
+    {q:'ロームはどのくらいする？',o:[{e:'🗺️',t:'積極的にローム！ADCを一人にしてでもマップに影響したい',v:'roam'},{e:'🤝',t:'ADCと一緒にいることを優先',v:'stay'},{e:'⚖️',t:'状況に応じて判断したい',v:'flex'}]},
+    {q:'チームへの貢献スタイルは？',o:[{e:'💪',t:'自分が先陣を切ってチームを勝ちに導く',v:'lead'},{e:'🛡️',t:'味方を守ることで間接的にチームを強くする',v:'guard'},{e:'🌐',t:'ビジョンとマクロでゲーム全体を管理する',v:'vision'},{e:'🎯',t:'特定のターゲットをCCや暗殺で確実に排除する',v:'target'}]}
+  ],
+  ch:{
+    thresh:{name:'THRESH',arch:'魂の収集者・万能プレイメイカー',
+      st:[{v:'S+',k:'SKILL'},{v:'S',k:'PLAYMAKING'},{v:'A',k:'CC'},{v:'B',k:'EASY'}],
+      picks:[{name:'スレッシュ',desc:'フックとランタンによる一方的プレイメイクがLoL最高峰。ソウルスタックによる無限成長システムが楽しい。使いこなすほど強くなる際限のない深みがある。',tags:['CATCHER','CC','HIGH SKILL','PLAYMAKER']},{name:'ノーチラス',desc:'スレッシュより難易度が低め。確実なCCとタンク性能で安定して仕事できる。',tags:['TANK','CC','ENGAGE','RELIABLE']}],
+      comment:'プレイメイクと試合を動かすことが好きなあなたにはスレッシュが完璧にフィット。フックが決まるたびに上達を実感できる楽しさがある。'},
+    milio:{name:'MILIO',arch:'炎の守護者・現環境最強エンチャンター',
+      st:[{v:'S',k:'PROTECT'},{v:'A',k:'POKE'},{v:'S',k:'CC CLEANSE'},{v:'A',k:'META'}],
+      picks:[{name:'ミリオ',desc:'Patch26.7エンチャンター最強クラス。Rの全CC解除が現環境で異常に強力。ナミナーフ後の最有力エンチャンター。',tags:['ENCHANTER','AP','CC CLEANSE','META']},{name:'ルル',desc:'ミリオよりポリモーフ妨害が面白い。',tags:['ENCHANTER','AP','PROTECT','POLYMORPH']}],
+      comment:'現環境最強クラスのエンチャンターを使いたいあなたにはミリオが完璧。RのCC解除が刺さる場面が多く今のメタとの相性が抜群。'},
+    nautilus:{name:'NAUTILUS',arch:'深海の番人・CCの権化',
+      st:[{v:'S',k:'CC'},{v:'S',k:'ENGAGE'},{v:'A',k:'SIMPLE'},{v:'B',k:'CARRY'}],
+      picks:[{name:'ノーチラス',desc:'QフックとRのターゲット指定スタンで確実にキルを作れる。CCの量が異常でチームが戦いやすい状況を作り続けられる。',tags:['TANK','CC','ENGAGE','SIMPLE']},{name:'レオナ',desc:'ノーチラスより積極的で序盤から仕掛けられる。',tags:['TANK','CC','ENGAGE','SOLAR']}],
+      comment:'CCで確実にキルを作りたいあなたにはノーチラスが完璧。Qフックが当たれば相手は絶対に逃げられないという安心感がプレイを楽にしてくれる。'},
+    braum:{name:'BRAUM',arch:'フレルヨードの大盾・ADC守護者',
+      st:[{v:'S',k:'PROTECT'},{v:'A',k:'CC'},{v:'S',k:'TANK'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ブラウム',desc:'Eの盾でADCへの飛び道具を全てブロックする最高の守護者。パッシブのコンカッシブブローズをチームメイトのAAで溜めるシステムが面白い。',tags:['WARDEN','CC','PROTECT','PASSIVE']},{name:'タリック',desc:'味方を無敵にするRが最高に強い。',tags:['WARDEN','AP','INVINCIBLE','PROTECT']}],
+      comment:'ADCを守ることに特化したいあなたにはブラウムが最高の選択。Eで全ての飛び道具を防ぐ守護者としての役割が最高に楽しい。'},
+    sona:{name:'SONA',arch:'弦楽の達人・最強エンチャンターDPS',
+      st:[{v:'S',k:'HEAL'},{v:'S',k:'POKE'},{v:'A',k:'TEAMFIGHT'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ソナ',desc:'Patch26.7サポート最高勝率クラスを維持し続ける最強エンチャンター。ナミナーフ後のトップエンチャンター。ヒール・ダメージ・バフ全部持ってる万能型。',tags:['ENCHANTER','AP','HEAL','META']},{name:'ミリオ',desc:'ソナよりCC解除能力が高い。',tags:['ENCHANTER','AP','CC CLEANSE','META']}],
+      comment:'安定して最高勝率のエンチャンターを使いたいあなたにはソナが完璧。ヒール・DPS・バフ全てを高いレベルで持つ現環境最強の一枚。'},
+    rell:{name:'RELL',arch:'鉄の乙女・Patch26.7最注目サポート',
+      st:[{v:'S',k:'ENGAGE'},{v:'A',k:'CC'},{v:'A',k:'BUFF'},{v:'B',k:'CARRY'}],
+      picks:[{name:'レル',desc:'Patch26.7でEとRが大バフを受けた現環境最注目サポート。EのMR/AR共有でチームメイトを強化しながらRのエンゲージで集団戦を制圧する。',tags:['TANK','CC','ENGAGE','BUFF']},{name:'ノーチラス',desc:'レルよりシンプルなCCエンゲージャー。',tags:['TANK','CC','ENGAGE','SIMPLE']}],
+      comment:'バフを配りながら集団戦で暴れたいあなたにはレルが今最高の選択。Patch26.7バフ後の強さはまだ完全に評価されていない注目株。'},
+    lulu:{name:'LULU',arch:'妖精の魔法使い・ADC最強守護者',
+      st:[{v:'S',k:'PROTECT'},{v:'S',k:'ENCHANT'},{v:'A',k:'POKE'},{v:'B',k:'ENGAGE'}],
+      picks:[{name:'ルル',desc:'ADCをRの巨大化とシールドで守りながらポリモーフで敵を妨害する最高のエンチャンター。ジンクス・ケイサとの相性が抜群。',tags:['ENCHANTER','AP','PROTECT','POLYMORPH']},{name:'ユーミ',desc:'ADCに乗り込んで守れる究極のプロテクターサポート。',tags:['ENCHANTER','AP','ATTACH','PROTECT']}],
+      comment:'ADCを守りながらチームを勝利に導きたいあなたにはルルが最高の相棒。シールドと巨大化Rで大切なADCを守る瞬間の達成感がある。'},
+    nami:{name:'NAMI',arch:'波の制御者・バランス型エンチャンター',
+      st:[{v:'A',k:'HEAL'},{v:'A',k:'CC'},{v:'A',k:'POKE'},{v:'B',k:'ENGAGE'}],
+      picks:[{name:'ナミ',desc:'ヒール・CC・バフ全部持ってる万能エンチャンター。Patch26.7でWナーフを受けたが依然として強力。',tags:['ENCHANTER','AP','HEAL','CC']},{name:'ソラカ',desc:'ナミより回復に特化。Wの無限回復でチームの延命力が最高クラス。',tags:['ENCHANTER','AP','HEAL','SUSTAIN']}],
+      comment:'ヒールとCC両方こなして安定してチームを支えたいあなたにはナミが完璧。ナーフ後も十分に強く、チームへの貢献感が高い。'},
+    blitzcrank:{name:'BLITZCRANK',arch:'巨大蒸気ゴーレム・最強フッカー',
+      st:[{v:'S',k:'HOOK'},{v:'A',k:'CC'},{v:'A',k:'SIMPLE'},{v:'S',k:'PRESSURE'}],
+      picks:[{name:'ブリッツクランク',desc:'Qのロケットグラブが当たれば相手は確定死というシンプルで強烈なキット。当たった時の爽快感が最高。',tags:['CATCHER','CC','SIMPLE','HOOK']},{name:'スレッシュ',desc:'ブリッツよりフックが難しいが当てた後の選択肢が広い。',tags:['CATCHER','CC','HIGH SKILL','PLAYMAKER']}],
+      comment:'グラブ1発でゲームを動かすシンプルで強烈なスタイルが好きなあなたにはブリッツが最高。フックが刺さった瞬間の爽快感はサポート随一。'},
+    pyke:{name:'PYKE',arch:'塩水港の処刑者・ローマーサポート',
+      st:[{v:'S',k:'ROAM'},{v:'S',k:'EXECUTE'},{v:'A',k:'KILL'},{v:'C',k:'PROTECT'}],
+      picks:[{name:'パイク',desc:'サポートなのに処刑でキルを量産できる唯一無二の存在。ローム力が高くマップ全体で影響を出せる。',tags:['ASSASSIN SUPP','CC','EXECUTE','ROAM']},{name:'セナ',desc:'パイクより安全で遠距離攻撃ができる。スタック溜めによるスケールとRのグローバルシールドが面白い。',tags:['MARKSMAN SUPP','SCALE','GLOBAL R','STACK']}],
+      comment:'攻撃的でキルを積極的に取りに行くスタイルが好きなあなたにはパイクが完璧にハマる。Rリセットの中毒性がある。'},
+    soraka:{name:'SORAKA',arch:'星の子・無限回復ヒーラー',
+      st:[{v:'S',k:'HEAL'},{v:'A',k:'GLOBAL'},{v:'A',k:'SUSTAIN'},{v:'A',k:'SIMPLE'}],
+      picks:[{name:'ソラカ',desc:'Wの無限回復でチームの延命力が最高クラス。Rのグローバルヒールで全マップのチームを回復できる。シンプルで確実に仕事できる安定ヒーラー。',tags:['ENCHANTER','AP','HEAL','GLOBAL']},{name:'ソナ',desc:'ソラカよりダメージとバフが高い。総合力が高い。',tags:['ENCHANTER','AP','HEAL','DPS']}],
+      comment:'ヒールに特化してチームの延命力を最大化したいあなたにはソラカが最高の選択。グローバルRでマップのどこにいる仲間でも助けられる達成感がある。'},
+    bard:{name:'BARD',arch:'放浪の仲裁者・ユニーク巡礼サポート',
+      st:[{v:'S',k:'UNIQUE'},{v:'A',k:'ROAM'},{v:'A',k:'MEEPS'},{v:'B',k:'EASY'}],
+      picks:[{name:'バード',desc:'音符を集めながら全マップを旅するという唯一無二のサポート。チャイム収集による無限成長とRの全体時間停止が楽しい。',tags:['ENCHANTER','AP','UNIQUE','ROAM']},{name:'レル',desc:'バードより攻撃的なエンゲージャー型。',tags:['TANK','CC','ENGAGE','BUFF']}],
+      comment:'自由にマップを旅しながらユニークなシステムを楽しみたいあなたにはバードが最高にフィット。他のサポートでは絶対に味わえない体験がある。'},
+    rakan:{name:'RAKAN',arch:'魅力的な大泥棒・ダンスエンゲージャー',
+      st:[{v:'S',k:'ENGAGE'},{v:'A',k:'CC'},{v:'A',k:'MOBILE'},{v:'B',k:'PROTECT'}],
+      picks:[{name:'ラカン',desc:'ザヤとのコンビが現環境最強クラス。Rのチャームエンゲージが派手で爽快。高い機動力で集団戦を自由に動き回る。',tags:['ENCHANTER','AP','ENGAGE','CHARMING']},{name:'レル',desc:'ラカンより耐久力が高い。タンクとして機能する。',tags:['TANK','CC','ENGAGE','BUFF']}],
+      comment:'積極的なエンゲージと機動力で試合を動かしたいあなたにはラカンが最高。Rチャームで敵を全員振り回しながら集団戦を制圧する爽快感は格別。'},
+    xerath:{name:'XERATH SUP',arch:'長射程砲台・ポーカーサポート',
+      st:[{v:'S',k:'POKE'},{v:'A',k:'RANGE'},{v:'A',k:'CC'},{v:'B',k:'ENGAGE'}],
+      picks:[{name:'ゼラス（サポート）',desc:'超長射程ポークでレーン相手を延々と削り続けるサポート。スキルショット精度が高いほど活躍できる。',tags:['ARTILLERY','AP','POKE','LONG RANGE']},{name:'ブランド',desc:'APポーカー系サポート。火炎パッシブ処刑とスタン付き。',tags:['MAGE','AP','POKE','BURN']}],
+      comment:'超長射程ポークで相手を一方的に削るスタイルが好きなあなたにはゼラスサポートが最高。Qを当て続けるだけでレーンを完全支配できる達成感がある。'},
+    senna:{name:'SENNA',arch:'贖罪の銃士・スタック成長マークスマンサポート',
+      st:[{v:'A',k:'SCALE'},{v:'A',k:'GLOBAL'},{v:'A',k:'SUSTAIN'},{v:'B',k:'EASY'}],
+      picks:[{name:'セナ',desc:'魂を収集して射程・AD・ライフスティールが無限成長するユニークなサポート。RのグローバルDawnshieldでマップのどこにいる味方でも助けられる。',tags:['MARKSMAN SUPP','AD','SCALE','GLOBAL']},{name:'パイク',desc:'セナより攻撃的なキル系サポート。',tags:['ASSASSIN SUPP','CC','EXECUTE','ROAM']}],
+      comment:'スタックを溜めながら無限に成長していくスタイルが好きなあなたにはセナが最高にフィット。魂収集という独特のシステムとグローバルRで味方を助ける達成感がある。'},
+    yuumi:{name:"YU'MI",arch:'魔法の猫・ペット密着型サポート',
+      st:[{v:'S',k:'SAFE'},{v:'S',k:'PROTECT'},{v:'A',k:'ATTACH'},{v:'A',k:'HEAL'}],
+      picks:[{name:'ユーミ',desc:'ADCやチームメイトに乗り込んで守り続けるという究極のプロテクターサポート。自分は基本的に無敵で乗り込んでいる味方を強化し続ける。',tags:['ENCHANTER','AP','ATTACH','UNKILLABLE']},{name:'ソラカ',desc:'ユーミより独立して動けるヒーラー。',tags:['ENCHANTER','AP','HEAL','GLOBAL']}],
+      comment:'絶対に死ねない安全なサポートスタイルが好きなあなたにはユーミが最高。ADCに乗り込んで一緒に勝利を目指すという唯一無二の体験ができる。'},
+    morgana:{name:'MORGANA',arch:'鎖の天使・APスネアサポート',
+      st:[{v:'A',k:'CC'},{v:'A',k:'SHIELD'},{v:'A',k:'POKE'},{v:'B',k:'ENGAGE'}],
+      picks:[{name:'モルガナ',desc:'Qのルートスネアとブラックシールドの組み合わせが強烈。相手のCCをシールドで無効化しながらQを当てればほぼ確定キルの安定型。',tags:['MAGE','AP','SNARE','SHIELD']},{name:'ノーチラス',desc:'モルガナよりエンゲージ力が高い。',tags:['TANK','CC','ENGAGE','SIMPLE']}],
+      comment:'スネアとシールドで確実にゲームを支配したいあなたにはモルガナが最高。Qが当たれば確定キルという強さと、相手のCCを無効化するシールドのコンボが楽しい。'},
+    leona:{name:'LEONA',arch:'夜明けの放射・太陽エンゲージャー',
+      st:[{v:'S',k:'ENGAGE'},{v:'S',k:'CC'},{v:'A',k:'SIMPLE'},{v:'B',k:'CARRY'}],
+      picks:[{name:'レオナ',desc:'全スキルにCCが付いた最強エンゲージャー。EQRのコンボで確実にスタン→キルを作れる。シンプルで使いやすく序盤から攻め続けられる。',tags:['TANK','CC','ENGAGE','SOLAR']},{name:'ノーチラス',desc:'レオナよりQフックによる遠距離エンゲージができる。',tags:['TANK','CC','ENGAGE','HOOK']}],
+      comment:'前線に突っ込んで全スキルのCCでゲームを制圧したいあなたにはレオナが最高。EQRコンボで確実にスタン→キルを量産できる爽快感がある。'},
+    taric:{name:'TARIC',arch:'天の楯・無敵防御サポート',
+      st:[{v:'S',k:'PROTECT'},{v:'A',k:'CC'},{v:'A',k:'TEAMFIGHT'},{v:'B',k:'EASY'}],
+      picks:[{name:'タリック',desc:'味方を無敵にするRが最高に強い。CC付きで集団戦にも参加できる。シンプルで使いやすい。',tags:['WARDEN','AP','INVINCIBLE','CC']},{name:'ブラウム',desc:'タリックより飛び道具ブロックと機動力が高い。',tags:['WARDEN','CC','PROTECT','PASSIVE']}],
+      comment:'味方を無敵にして試合を決める究極の守護者スタイルが好きなあなたにはタリックが最高。Rの無敵が正確なタイミングで決まった瞬間のカタルシスは格別。'},
+    zilean:{name:'ZILEAN',arch:'時の守護者・時間操作サポート',
+      st:[{v:'A',k:'REVIVE'},{v:'A',k:'SLOW'},{v:'A',k:'POKE'},{v:'S',k:'UTILITY'}],
+      picks:[{name:'ジルイン',desc:'Rで味方を一時蘇生できるという唯一無二のユーティリティ。爆弾スタン・スロウ・バーストダメージを持ちながら蘇生まで持てる万能型。',tags:['SUPPORT','AP','REVIVE','UNIQUE']},{name:'バード',desc:'同じくユニークなシステムを持つ万能型。ローム力はバードが上。',tags:['ENCHANTER','AP','UNIQUE','ROAM']}],
+      comment:'ユニークなシステムと万能な貢献力を求めるあなたにはジルインが最高にフィット。Rで仲間を蘇生させた時の達成感と感謝はLoLで最高の体験のひとつ。'},
+    poppy:{name:'POPPY',arch:'アイアンエンバサダー・アンチダッシュタンク',
+      st:[{v:'A',k:'ENGAGE'},{v:'A',k:'ANTI-DASH'},{v:'A',k:'TANK'},{v:'B',k:'CARRY'}],
+      picks:[{name:'ポッピー',desc:'W発動中はダッシュを完全封殺するアンチダッシュタンク。Rで敵を吹き飛ばして集団戦から除外できる特殊システムが強烈。',tags:['TANK','CC','ANTI-DASH','WARDEN']},{name:'レル',desc:'ポッピーよりバフとエンゲージ力が高い。',tags:['TANK','CC','ENGAGE','BUFF']}],
+      comment:'ダッシュを封殺してダイブを完全阻止したいあなたにはポッピーが最高にフィット。Rで敵を吹き飛ばした時の爽快感がある。'},
+    renataGlasc:{name:'RENATA GLASC',arch:'ゼリン化学兵器・ユーティリティキャリーサポート',
+      st:[{v:'S',k:'UTILITY'},{v:'S',k:'TEAMFIGHT'},{v:'A',k:'CARRY'},{v:'B',k:'EASY'}],
+      picks:[{name:'レナタ・グラスク',desc:'Patch26.7Sティア高勝率。Wのレサレクション（アリーを一度復活させる）とRの全体バーサーカーが唯一無二。',tags:['ENCHANTER','AP','REVIVE','BERSERK']},{name:'ジルイン',desc:'同じく蘇生要素を持つユーティリティサポート。',tags:['SUPPORT','AP','REVIVE','UTILITY']}],
+      comment:'ユニークなW蘇生と全体バーサーカーRで試合を完全に変えたいあなたにはレナタが最高の選択。Patch26.7Sティアの強さと独特な体験が楽しい。'}
+  },
+  calc(A){
+    const s={thresh:0,milio:0,nautilus:0,braum:0,sona:0,rell:0,lulu:0,nami:0,blitzcrank:0,pyke:0,soraka:0,bard:0,rakan:0,xerath:0,senna:0,yuumi:0,morgana:0,leona:0,taric:0,zilean:0,poppy:0,renataGlasc:0};
+    if(A[0]==='engage'){s.nautilus+=3;s.thresh+=2;s.blitzcrank+=2;s.leona+=3;s.rell+=2;}
+    if(A[0]==='heal'){s.lulu+=3;s.nami+=3;s.milio+=2;s.soraka+=3;s.sona+=2;}
+    if(A[0]==='control'){s.thresh+=2;s.nami+=2;s.milio+=1;s.morgana+=2;s.bard+=1;}
+    if(A[0]==='kill'){s.pyke+=3;s.blitzcrank+=2;s.leona+=2;s.xerath+=2;}
+    if(A[1]==='aggressive'){s.blitzcrank+=2;s.pyke+=2;s.nautilus+=1;s.leona+=3;}
+    if(A[1]==='defensive'){s.braum+=3;s.lulu+=2;s.nami+=2;s.soraka+=2;s.yuumi+=2;}
+    if(A[1]==='vision'){s.thresh+=2;s.milio+=2;s.bard+=2;s.morgana+=1;}
+    if(A[2]==='front'){s.nautilus+=3;s.thresh+=2;s.leona+=3;s.rell+=2;s.rakan+=2;}
+    if(A[2]==='back'){s.lulu+=3;s.nami+=2;s.milio+=2;s.soraka+=2;s.sona+=2;}
+    if(A[2]==='special'){s.thresh+=2;s.pyke+=2;s.bard+=2;s.zilean+=2;s.renataGlasc+=2;}
+    if(A[3]==='duo'){s.lulu+=2;s.braum+=2;s.nami+=2;s.rakan+=2;s.yuumi+=2;}
+    if(A[3]==='roam'){s.pyke+=3;s.thresh+=2;s.bard+=2;s.senna+=2;}
+    if(A[3]==='carry'){s.pyke+=2;s.blitzcrank+=2;s.leona+=2;s.xerath+=2;}
+    if(A[4]==='easy'){s.nautilus+=3;s.braum+=3;s.blitzcrank+=2;s.soraka+=2;s.sona+=2;s.leona+=2;}
+    if(A[4]==='mid'){s.nami+=2;s.lulu+=2;s.milio+=2;s.morgana+=2;s.taric+=2;}
+    if(A[4]==='hard'){s.thresh+=3;s.pyke+=2;s.bard+=2;s.renataGlasc+=1;}
+    if(A[5]==='hardcc'){s.nautilus+=3;s.blitzcrank+=3;s.thresh+=1;s.leona+=3;s.morgana+=2;}
+    if(A[5]==='softcc'){s.lulu+=3;s.nami+=2;s.milio+=2;s.soraka+=1;s.sona+=2;}
+    if(A[5]==='damage'){s.pyke+=3;s.thresh+=1;s.xerath+=3;s.sona+=1;}
+    if(A[6]==='hook'){s.blitzcrank+=3;s.thresh+=2;s.nautilus+=1;s.morgana+=2;}
+    if(A[6]==='save'){s.braum+=3;s.lulu+=2;s.nami+=2;s.soraka+=2;s.taric+=2;s.renataGlasc+=2;}
+    if(A[6]==='vision'){s.thresh+=2;s.milio+=2;s.bard+=2;s.senna+=1;}
+    if(A[6]==='engage'){s.nautilus+=2;s.thresh+=2;s.blitzcrank+=1;s.leona+=3;s.rakan+=2;s.rell+=2;}
+    if(A[7]==='playmaker'){s.thresh+=3;s.pyke+=2;s.blitzcrank+=1;s.rakan+=2;s.bard+=1;}
+    if(A[7]==='protector'){s.braum+=3;s.lulu+=2;s.nami+=2;s.soraka+=2;s.yuumi+=2;s.taric+=2;}
+    if(A[7]==='strategist'){s.milio+=3;s.thresh+=2;s.nami+=1;s.bard+=2;s.zilean+=2;}
+    if(A[7]==='semicarry'){s.pyke+=3;s.thresh+=1;s.xerath+=2;s.senna+=2;}
+    if(A[8]==='roam'){s.pyke+=3;s.bard+=3;s.thresh+=2;s.senna+=2;}
+    if(A[8]==='stay'){s.lulu+=2;s.braum+=2;s.nami+=2;s.soraka+=2;s.yuumi+=3;}
+    if(A[8]==='flex'){s.milio+=2;s.nautilus+=1;s.sona+=2;s.morgana+=1;}
+    if(A[9]==='lead'){s.thresh+=2;s.leona+=3;s.blitzcrank+=2;s.rakan+=2;}
+    if(A[9]==='guard'){s.braum+=3;s.lulu+=2;s.soraka+=2;s.taric+=2;s.yuumi+=2;}
+    if(A[9]==='vision'){s.milio+=3;s.bard+=3;s.thresh+=1;s.zilean+=2;}
+    if(A[9]==='target'){s.nautilus+=2;s.morgana+=3;s.thresh+=1;s.pyke+=2;}
+    return Object.entries(s).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+};
+
+// ============================================================
+// ROLE MAP & CONTROLLER
+// ============================================================
+
+
+var ROLES = {top:TOP, jg:JG, mid:MID, bot:BOT, sup:SUP};
+var curRole = null;
+var curQ = 0;
+var ans = [];
+
+function startRole(role) {
+  curRole = role;
+  curQ = 0;
+  ans = [];
+  var D = ROLES[role];
+
+  // バッジ
+  var badge = document.getElementById('qbadge');
+  badge.textContent = D.label;
+  badge.style.color = D.color;
+  badge.style.borderColor = D.color;
+
+  // 質問カード生成
+  var wrap = document.getElementById('qwrap');
+  wrap.innerHTML = '';
+
+  for (var i = 0; i < D.qs.length; i++) {
+    var q = D.qs[i];
+    var card = document.createElement('div');
+    card.id = 'q' + i;
+    card.className = 'qcard';
+    card.style.display = i === 0 ? 'block' : 'none';
+
+    var num = document.createElement('div');
+    num.className = 'qnum';
+    num.textContent = 'QUESTION ' + ('0' + (i + 1)).slice(-2) + ' / ' + D.qs.length;
+    card.appendChild(num);
+
+    var txt = document.createElement('div');
+    txt.className = 'qtxt';
+    txt.textContent = q.q;
+    card.appendChild(txt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+
+    for (var j = 0; j < q.o.length; j++) {
+      (function(qi, opt) {
+        var btn = document.createElement('button');
+        btn.className = 'opt';
+
+        var em = document.createElement('span');
+        em.className = 'opt-e';
+        em.textContent = opt.e;
+        btn.appendChild(em);
+
+        var sp = document.createElement('span');
+        sp.textContent = opt.t;
+        btn.appendChild(sp);
+
+        btn.addEventListener('click', function() {
+          selectAnswer(qi, opt.v, btn);
+        });
+        opts.appendChild(btn);
+      })(i, q.o[j]);
+    }
+
+    card.appendChild(opts);
+    wrap.appendChild(card);
+  }
+
+  // 画面切り替え
+  document.getElementById('s-role').style.display = 'none';
+  document.getElementById('s-res').style.display = 'none';
+  document.getElementById('s-quiz').style.display = 'block';
+
+  updateProgress(0, D.qs.length);
+}
+
+function selectAnswer(qi, val, btn) {
+  ans[qi] = val;
+
+  // 選択肢を全部無効化
+  var allBtns = document.getElementById('q' + qi).querySelectorAll('.opt');
+  for (var i = 0; i < allBtns.length; i++) {
+    allBtns[i].disabled = true;
+  }
+  btn.classList.add('sel');
+
+  var total = ROLES[curRole].qs.length;
+
+  setTimeout(function() {
+    document.getElementById('q' + qi).style.display = 'none';
+
+    if (qi < total - 1) {
+      var nextQ = qi + 1;
+      document.getElementById('q' + nextQ).style.display = 'block';
+      updateProgress(nextQ, total);
+    } else {
+      updateProgress(total, total);
+      showResult();
+    }
+  }, 280);
+}
+
+function updateProgress(cur, total) {
+  var pct = Math.round(cur / total * 100);
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('plbl').textContent = cur >= total ? 'COMPLETE' : 'Q' + (cur + 1) + '/' + total;
+  document.getElementById('ppct').textContent = pct + '%';
+}
+
+function showResult() {
+  var D = ROLES[curRole];
+  var key = D.calc(ans);
+  var R = D.ch[key];
+
+  // fallback
+  if (!R) {
+    var keys = Object.keys(D.ch);
+    R = D.ch[keys[0]];
+  }
+
+  document.getElementById('rname').textContent = R.name;
+  document.getElementById('rarch').textContent = R.arch;
+
+  var statsHtml = '';
+  for (var i = 0; i < R.st.length; i++) {
+    statsHtml += '<div class="scell"><span class="sv">' + R.st[i].v + '</span><span class="sk">' + R.st[i].k + '</span></div>';
+  }
+  document.getElementById('rstats').innerHTML = statsHtml;
+
+  var picksHtml = '';
+  for (var i = 0; i < R.picks.length; i++) {
+    var p = R.picks[i];
+    var tagsHtml = '';
+    for (var j = 0; j < p.tags.length; j++) {
+      tagsHtml += '<span class="ptag">' + p.tags[j] + '</span>';
+    }
+    picksHtml += '<div class="pick' + (i === 0 ? ' top' : '') + '">';
+    picksHtml += '<div class="pname">' + p.name + '</div>';
+    picksHtml += '<div class="pdesc">' + p.desc + '</div>';
+    picksHtml += '<div class="ptags">' + tagsHtml + '</div>';
+    picksHtml += '</div>';
+  }
+  document.getElementById('rpicks').innerHTML = picksHtml;
+  document.getElementById('rcomment').textContent = R.comment;
+
+  document.getElementById('s-quiz').style.display = 'none';
+  document.getElementById('s-res').style.display = 'block';
+}
+
+function retryQuiz() {
+  document.getElementById('s-res').style.display = 'none';
+  startRole(curRole);
+}
+
+function goTop() {
+  document.getElementById('s-res').style.display = 'none';
+  document.getElementById('s-quiz').style.display = 'none';
+  document.getElementById('s-role').style.display = 'block';
+  curRole = null;
+  ans = [];
+}
+
+// ── イベントバインド ──
+document.getElementById('btn-top').addEventListener('click', function() { startRole('top'); });
+document.getElementById('btn-jg').addEventListener('click',  function() { startRole('jg'); });
+document.getElementById('btn-mid').addEventListener('click', function() { startRole('mid'); });
+document.getElementById('btn-bot').addEventListener('click', function() { startRole('bot'); });
+document.getElementById('btn-sup').addEventListener('click', function() { startRole('sup'); });
+document.getElementById('btn-retry').addEventListener('click', retryQuiz);
+document.getElementById('btn-top2').addEventListener('click', goTop);
+</script>
+</body>
+</html>

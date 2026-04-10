@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoL FAN GUIDE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0e0e18;
+  --surface: #16162a;
+  --card:    #1c1c32;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #e8e0ff;
+  --muted:   rgba(232,224,255,0.45);
+  --accent:  #7c6fff;
+  --accent2: #ff6fd8;
+  --glow:    rgba(124,111,255,0.3);
+  --gold:    #ffd166;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BG ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,111,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 90% 80%, rgba(255,111,216,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 50% at 5%  60%, rgba(124,111,255,0.06) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── GRID PATTERN ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124,111,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,111,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+/* ── HEADER ── */
+.site-header {
+  padding: 40px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.site-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 4px;
+  color: var(--accent);
+}
+.site-patch {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* ── HERO ── */
+.hero {
+  text-align: center;
+  padding: 80px 0 72px;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  animation: fadeUp .6s ease both;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 14vw, 110px);
+  line-height: 0.9;
+  letter-spacing: 4px;
+  margin-bottom: 24px;
+  animation: fadeUp .6s .1s ease both;
+}
+.hero-title .line1 { color: var(--text); display: block; }
+.hero-title .line2 {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+}
+.hero-sub {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 2;
+  max-width: 400px;
+  margin: 0 auto 40px;
+  animation: fadeUp .6s .2s ease both;
+}
+.hero-divider {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+  margin: 0 auto;
+  animation: fadeUp .6s .3s ease both;
+}
+
+/* ── CONTENT SECTION ── */
+.content-section {
+  margin-bottom: 80px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.section-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  opacity: 0.6;
+}
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 4px;
+  color: var(--text);
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── CONTENT CARDS ── */
+.content-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.content-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px 24px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  overflow: hidden;
+  transition: all .25s;
+  cursor: pointer;
+}
+.content-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity .25s;
+  z-index: 0;
+}
+.content-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px var(--glow);
+  border-color: rgba(124,111,255,0.5);
+}
+.content-card:hover::before { opacity: 0.06; }
+
+.content-card > * { position: relative; z-index: 1; }
+
+.card-tag {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-tag::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.card-icon {
+  font-size: 40px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 3px;
+  color: var(--text);
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-bottom: 20px;
+}
+
+.card-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.card-chip {
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(124,111,255,0.3);
+  color: var(--muted);
+}
+
+.card-cta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.card-cta-arrow {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all .2s;
+}
+.content-card:hover .card-cta-arrow {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── FEATURED (大きいカード) ── */
+.content-card.featured {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 36px 32px;
+}
+@media (max-width: 600px) {
+  .content-card.featured {
+    grid-template-columns: 1fr;
+  }
+}
+.featured-visual {
+  background: linear-gradient(135deg, rgba(124,111,255,0.15), rgba(255,111,216,0.1));
+  border-radius: 12px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  position: relative;
+  overflow: hidden;
+}
+.featured-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(124,111,255,0.2);
+}
+
+/* ── COMING SOON ── */
+.content-card.coming-soon {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+.coming-soon-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(255,209,102,0.15);
+  border: 1px solid rgba(255,209,102,0.3);
+  color: var(--gold);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 80px;
+}
+.stat-cell {
+  background: var(--card);
+  padding: 24px 20px;
+  text-align: center;
+}
+.stat-cell-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-cell-l {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 2.2;
+  border-top: 1px solid var(--border);
+  padding-top: 32px;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.content-section {
+  animation: fadeUp .6s ease both;
+}
+.content-section:nth-child(1) { animation-delay: .3s; }
+.content-section:nth-child(2) { animation-delay: .45s; }
+.stats-bar { animation: fadeUp .6s .25s ease both; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="site-logo">LoL Fan Guide</div>
+    <div class="site-patch">Patch 26.7</div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">League of Legends Fansite</div>
+    <h1 class="hero-title">
+      <span class="line1">KNOW YOUR</span>
+      <span class="line2">CHAMPION</span>
+    </h1>
+    <p class="hero-sub">チャンプ情報・診断テストで<br>あなたのLoLライフをもっと楽しく。</p>
+    <div class="hero-divider"></div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-cell">
+      <div class="stat-cell-n">23</div>
+      <div class="stat-cell-l">MIDチャンプ収録</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-n">120</div>
+      <div class="stat-cell-l">診断テスト設問</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-n">26.7</div>
+      <div class="stat-cell-l">最新パッチ対応</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: CONTENTS -->
+  <div class="content-section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-label">CONTENTS</span>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="content-cards">
+
+      <!-- チャンプ診断 (featured) -->
+      <a href="lol_champion_finder_v3.html" class="content-card featured">
+        <div class="featured-visual">🎯</div>
+        <div>
+          <div class="card-tag">診断テスト</div>
+          <div class="card-title">CHAMPION<br>FINDER</div>
+          <div class="card-desc">
+            ロールを選んで10問に答えるだけ。あなたのプレイスタイルにぴったりのチャンピオンが見つかる。全5ロール対応、各24チャンプ収録。
+          </div>
+          <div class="card-meta">
+            <span class="card-chip">全5ロール</span>
+            <span class="card-chip">各24チャンプ</span>
+            <span class="card-chip">10問診断</span>
+          </div>
+          <div class="card-cta">
+            診断スタート
+            <div class="card-cta-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <!-- MIDガイド -->
+      <a href="mid.html" class="content-card">
+        <span class="card-icon">✨</span>
+        <div class="card-tag">チャンプガイド</div>
+        <div class="card-title">MID LANE<br>GUIDE</div>
+        <div class="card-desc">
+          MIDレーン全23チャンプのスキル・ビルド・ルーン・カウンター情報を完全収録。初心者から上級者向けのTipsつき。
+        </div>
+        <div class="card-meta">
+          <span class="card-chip">23チャンプ</span>
+          <span class="card-chip">カウンター情報</span>
+        </div>
+        <div class="card-cta">
+          チャンプを見る
+          <div class="card-cta-arrow">→</div>
+        </div>
+      </a>
+
+      <!-- Coming Soon: TOP -->
+      <div class="content-card coming-soon">
+        <div class="coming-soon-badge">Coming Soon</div>
+        <span class="card-icon">⚔️</span>
+        <div class="card-tag">チャンプガイド</div>
+        <div class="card-title">TOP LANE<br>GUIDE</div>
+        <div class="card-desc">
+          TOPレーンのチャンプガイドを準備中。
+        </div>
+        <div class="card-cta">
+          準備中
+          <div class="card-cta-arrow">…</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2: ABOUT -->
+  <div class="content-section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-label">ABOUT</span>
+      <span class="section-line"></span>
+    </div>
+
+    <div class="content-cards">
+      <div class="content-card" style="pointer-events:none">
+        <span class="card-icon">💜</span>
+        <div class="card-title">FAN MADE</div>
+        <div class="card-desc">
+          このサイトはファンメイドです。League of Legends および関連素材はRiot Gamesの著作物です。掲載データはPatch 26.7時点のものです。
+        </div>
+      </div>
+      <div class="content-card" style="pointer-events:none">
+        <span class="card-icon">📊</span>
+        <div class="card-title">DATA SOURCE</div>
+        <div class="card-desc">
+          掲載データはU.GG・Mobalytics・MetaBot.ggの統計情報をもとにしています。最新の情報は各サイトでご確認ください。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    LoL Fan Guide ／ This is a fan-made site.<br>
+    League of Legends © Riot Games. All rights reserved.
+  </footer>
+
+</div>
+</body>
+</html>

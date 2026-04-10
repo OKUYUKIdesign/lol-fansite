@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャンプ詳細 — MID LANE GUIDE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0e0e18;
+  --surface: #16162a;
+  --card:    #1c1c32;
+  --border:  rgba(255,255,255,0.07);
+  --text:    #e8e0ff;
+  --muted:   rgba(232,224,255,0.45);
+  --accent:  #7c6fff;
+  --accent2: #ff6fd8;
+  --glow:    rgba(124,111,255,0.25);
+  --gold:    #ffd166;
+  --champ-color: #7c6fff;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 90% 0%, color-mix(in srgb, var(--champ-color) 15%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 0% 100%, rgba(255,111,216,0.06) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:0 20px 80px; }
+
+/* ── NAV ── */
+.top-nav {
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.back-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: var(--muted);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all .18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-btn:hover { color: var(--text); border-color: var(--accent); }
+.breadcrumb {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ── HERO ── */
+.champ-hero {
+  padding: 32px 0 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 28px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.hero-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  flex-shrink: 0;
+  position: relative;
+}
+.hero-icon::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 22px;
+  border: 3px solid transparent;
+  background: linear-gradient(135deg, var(--champ-color), var(--accent2)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+}
+
+.hero-info {}
+.hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--champ-color);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.hero-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 10vw, 72px);
+  line-height: 0.9;
+  color: var(--text);
+  letter-spacing: 3px;
+  text-shadow: 0 0 40px color-mix(in srgb, var(--champ-color) 40%, transparent);
+}
+.hero-title {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.badge {
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid;
+  font-weight: 700;
+}
+.badge-arch { border-color: var(--champ-color); color: var(--champ-color); }
+.badge-dmg-ap { border-color: #7080ff; color: #a0b0ff; background: rgba(100,120,255,0.1); }
+.badge-dmg-ad { border-color: #ff9050; color: #ffa060; background: rgba(255,160,80,0.1); }
+.badge-dmg-mix { border-color: #ffc850; color: #ffd060; background: rgba(255,200,80,0.1); }
+.badge-diff { border-color: var(--gold); color: var(--gold); background: rgba(255,209,102,0.1); }
+
+/* ── STAT BARS ── */
+.stat-section {
+  margin-bottom: 32px;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.stat-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+}
+.stat-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width .8s cubic-bezier(.4,0,.2,1);
+}
+.stat-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  width: 16px;
+  text-align: center;
+}
+
+/* ── SECTIONS ── */
+.section {
+  margin-bottom: 36px;
+}
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-icon { font-size: 20px; }
+
+/* ── SKILLS ── */
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skill-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: border-color .18s;
+}
+.skill-row:hover { border-color: rgba(124,111,255,0.3); }
+.skill-key {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  min-width: 28px;
+  height: 28px;
+  background: var(--champ-color);
+  color: #fff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+.skill-content {}
+.skill-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.skill-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+/* ── BUILD ── */
+.build-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.build-row {
+  margin-bottom: 16px;
+}
+.build-row:last-child { margin-bottom: 0; }
+.build-row-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.build-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.build-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.build-item-icon { font-size: 14px; }
+.build-item.core { border-color: var(--gold); color: var(--gold); background: rgba(255,209,102,0.06); }
+.build-item.boots { border-color: rgba(160,200,255,0.4); color: #a0c8ff; }
+.build-item.situational { opacity: 0.7; }
+
+/* ── RUNES ── */
+.rune-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.rune-icon {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+.rune-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.rune-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.rune-reason {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+/* ── STRENGTHS / WEAKNESSES ── */
+.sw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 560px) { .sw-grid { grid-template-columns: 1fr; } }
+
+.sw-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.sw-box.strengths { border-top: 3px solid #4ddb8a; }
+.sw-box.weaknesses { border-top: 3px solid #ff6b6b; }
+.sw-box-title {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+.strengths .sw-box-title { color: #4ddb8a; }
+.weaknesses .sw-box-title { color: #ff6b6b; }
+.sw-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sw-list li {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  padding-left: 16px;
+  position: relative;
+}
+.sw-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.strengths .sw-list li::before { background: #4ddb8a; }
+.weaknesses .sw-list li::before { background: #ff6b6b; }
+
+/* ── COUNTERS ── */
+.counters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.counter-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid #ff6b6b;
+  border-radius: 0 12px 12px 0;
+  padding: 16px 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: all .18s;
+}
+.counter-card:hover { border-color: #ff6b6b; background: rgba(255,107,107,0.06); }
+.counter-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,107,107,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  font-family: 'Bebas Neue', sans-serif;
+  color: #ff6b6b;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.counter-info {}
+.counter-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.counter-reason {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+/* ── TIPS ── */
+.tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 560px) { .tips-grid { grid-template-columns: 1fr; } }
+
+.tip-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.tip-box.beginner { border-top: 3px solid #4daaff; }
+.tip-box.advanced { border-top: 3px solid var(--accent2); }
+.tip-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.beginner .tip-label { color: #4daaff; }
+.advanced .tip-label { color: var(--accent2); }
+.tip-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.85;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  margin-top: 48px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.nav-btn {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 20px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 12px;
+  text-decoration: none;
+  transition: all .18s;
+  display: block;
+}
+.nav-btn:hover { color: var(--text); border-color: var(--accent); }
+.nav-btn-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; color: var(--muted); }
+.nav-btn-name { font-weight: 800; font-size: 13px; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.section { animation: fadeUp .5s ease both; }
+.section:nth-child(1) { animation-delay: .05s; }
+.section:nth-child(2) { animation-delay: .10s; }
+.section:nth-child(3) { animation-delay: .15s; }
+.section:nth-child(4) { animation-delay: .20s; }
+.section:nth-child(5) { animation-delay: .25s; }
+.section:nth-child(6) { animation-delay: .30s; }
+.section:nth-child(7) { animation-delay: .35s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- NAV -->
+  <nav class="top-nav">
+    <a href="mid.html" class="back-btn">← 一覧に戻る</a>
+    <span class="breadcrumb">MID LANE GUIDE</span>
+  </nav>
+
+  <!-- content injected by JS -->
+  <div id="page-content"></div>
+
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+
+  // ── Get ID from URL ──
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+
+  if(!id || !CHAMPS[id]){
+    document.getElementById('page-content').innerHTML =
+      '<div style="text-align:center;padding:80px 20px;color:rgba(232,224,255,0.4)">' +
+      '<div style="font-size:64px;margin-bottom:16px">😅</div>' +
+      '<div style="font-size:18px">チャンプが見つかりませんでした</div>' +
+      '<a href="index.html" style="color:#7c6fff;margin-top:16px;display:block">← 一覧に戻る</a>' +
+      '</div>';
+    return;
+  }
+
+  var c = CHAMPS[id];
+
+  // ── Set theme color ──
+  document.documentElement.style.setProperty('--champ-color', c.color);
+  document.title = c.name + ' — MID LANE GUIDE';
+
+  // ── Helpers ──
+  var EMOJI = {
+    'コントロールメイジ':       '🔮',
+    'APアサシン':               '⚡',
+    'ADアサシン':               '🗡️',
+    'バーストメイジ':           '💥',
+    'アーティラリーメイジ':     '🏹',
+    'APファイター':             '🔥',
+    'ファイター':               '⚔️',
+    'マークスマン（AD/AP混合）':'🎯',
+    'スケーリングメイジ':       '🌟',
+    'タンク/コントロールメイジ':'🛡️'
+  };
+  var emoji = EMOJI[c.archetype] || '✨';
+
+  var dmgBadgeClass = c.damage === 'AP' ? 'badge-dmg-ap' : c.damage === 'AD' ? 'badge-dmg-ad' : 'badge-dmg-mix';
+
+  // stat bar color based on value
+  function statColor(v){
+    if(v <= 2) return '#ff6b6b';
+    if(v <= 3) return '#ffd166';
+    return '#4ddb8a';
+  }
+
+  // ── Stat bars ──
+  var statDefs = [
+    { key:'mobility',   label:'機動力' },
+    { key:'burst',      label:'バースト' },
+    { key:'sustain',    label:'継戦力' },
+    { key:'cc',         label:'CC力' },
+    { key:'laning',     label:'レーン強度' },
+    { key:'teamfight',  label:'集団戦' }
+  ];
+
+  var statBarsHtml = '';
+  statDefs.forEach(function(s){
+    var v = c.stats[s.key] || 0;
+    var pct = (v / 5) * 100;
+    var col = statColor(v);
+    statBarsHtml +=
+      '<div class="stat-row">' +
+        '<div class="stat-label">' + s.label + '</div>' +
+        '<div class="stat-bar-wrap"><div class="stat-bar-fill" style="width:' + pct + '%;background:' + col + '"></div></div>' +
+        '<div class="stat-val">' + v + '</div>' +
+      '</div>';
+  });
+
+  // ── Skills ──
+  var skillsHtml = '';
+  c.skills.forEach(function(sk){
+    skillsHtml +=
+      '<div class="skill-row">' +
+        '<div class="skill-key">' + sk.key + '</div>' +
+        '<div class="skill-content">' +
+          '<div class="skill-name">' + sk.name + '</div>' +
+          '<div class="skill-desc">' + sk.desc + '</div>' +
+        '</div>' +
+      '</div>';
+  });
+
+  // ── Build ──
+  var coreItems = c.build.core.map(function(item){
+    return '<div class="build-item core"><span class="build-item-icon">⚔️</span>' + item + '</div>';
+  }).join('');
+
+  var sitItems = c.build.situational.map(function(item){
+    return '<div class="build-item situational">◇ ' + item + '</div>';
+  }).join('');
+
+  // ── Rune icon ──
+  var runeIcons = {
+    'エレクトロキュート': '⚡',
+    'コンカー':          '🔥',
+    'フリート・フットワーク': '💨',
+    'フェイズラッシュ':  '🌀',
+    'アフターショック':  '🛡️',
+    'アークエンジェル':  '👼',
+    'グレイシャル・オーグメント': '❄️',
+    'レタリビューション': '🌟'
+  };
+  var runeIcon = runeIcons[c.runes.main] || '💎';
+
+  // ── Strengths / Weaknesses ──
+  var strHtml = c.strengths.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+  var wkHtml  = c.weaknesses.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+
+  // ── Counters ──
+  var ctrHtml = '';
+  c.counters.forEach(function(ctr){
+    var initials = ctr.name.slice(0, 2);
+    ctrHtml +=
+      '<a href="champ.html?id=' + ctr.id + '" class="counter-card">' +
+        '<div class="counter-icon">' + initials + '</div>' +
+        '<div class="counter-info">' +
+          '<div class="counter-name">' + ctr.name + '</div>' +
+          '<div class="counter-reason">' + ctr.reason + '</div>' +
+        '</div>' +
+      '</a>';
+  });
+
+  // ── Prev / Next nav ──
+  var idx = CHAMP_LIST.indexOf(id);
+  var prevId = idx > 0 ? CHAMP_LIST[idx - 1] : null;
+  var nextId = idx < CHAMP_LIST.length - 1 ? CHAMP_LIST[idx + 1] : null;
+  var prevC = prevId ? CHAMPS[prevId] : null;
+  var nextC = nextId ? CHAMPS[nextId] : null;
+
+  var bottomNavHtml =
+    '<div class="bottom-nav">' +
+    (prevC
+      ? '<a href="champ.html?id=' + prevId + '" class="nav-btn"><div class="nav-btn-label">← 前のチャンプ</div><div class="nav-btn-name">' + prevC.name + '</div></a>'
+      : '<div class="nav-btn" style="opacity:0.3;pointer-events:none"><div class="nav-btn-label">← 前のチャンプ</div><div class="nav-btn-name">-</div></div>') +
+    '<a href="mid.html" class="nav-btn" style="flex:0.6"><div class="nav-btn-label">📋</div><div class="nav-btn-name">一覧</div></a>' +
+    (nextC
+      ? '<a href="champ.html?id=' + nextId + '" class="nav-btn"><div class="nav-btn-label">次のチャンプ →</div><div class="nav-btn-name">' + nextC.name + '</div></a>'
+      : '<div class="nav-btn" style="opacity:0.3;pointer-events:none"><div class="nav-btn-label">次のチャンプ →</div><div class="nav-btn-name">-</div></div>') +
+    '</div>';
+
+  // ── Assemble HTML ──
+  var html =
+    // HERO
+    '<div class="champ-hero">' +
+      '<div class="hero-icon" style="background:' + c.color + '22">' + emoji + '</div>' +
+      '<div class="hero-info">' +
+        '<div class="hero-eyebrow">MID LANE</div>' +
+        '<div class="hero-name">' + c.en.toUpperCase() + '</div>' +
+        '<div class="hero-title">' + c.name + ' ／ ' + c.title + '</div>' +
+        '<div class="hero-badges">' +
+          '<span class="badge badge-arch">' + c.archetype + '</span>' +
+          '<span class="badge ' + dmgBadgeClass + '">' + c.damage + '</span>' +
+          '<span class="badge badge-diff">' + DIFFICULTY_LABEL[c.difficulty] + ' ' + DIFFICULTY_TEXT[c.difficulty] + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // STATS
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">📊</span>ステータス</div>' +
+      '<div class="stat-section">' + statBarsHtml + '</div>' +
+    '</div>' +
+
+    // SKILLS
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">✨</span>スキル</div>' +
+      '<div class="skills-list">' + skillsHtml + '</div>' +
+    '</div>' +
+
+    // BUILD
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">⚔️</span>推奨ビルド</div>' +
+      '<div class="build-section">' +
+        '<div class="build-row">' +
+          '<div class="build-row-label">コアアイテム</div>' +
+          '<div class="build-items">' + coreItems + '</div>' +
+        '</div>' +
+        '<div class="build-row">' +
+          '<div class="build-row-label">ブーツ</div>' +
+          '<div class="build-items"><div class="build-item boots">👟 ' + c.build.boots + '</div></div>' +
+        '</div>' +
+        '<div class="build-row">' +
+          '<div class="build-row-label">状況に応じて</div>' +
+          '<div class="build-items">' + sitItems + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // RUNES
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">💎</span>推奨ルーン</div>' +
+      '<div class="rune-section">' +
+        '<div class="rune-icon">' + runeIcon + '</div>' +
+        '<div>' +
+          '<div class="rune-main">' + c.runes.main + '</div>' +
+          '<div class="rune-sub">サブツリー: ' + c.runes.secondary + '</div>' +
+          '<div class="rune-reason">' + c.runes.keystone_reason + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // STRENGTHS / WEAKNESSES
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">⚖️</span>強み ／ 弱み</div>' +
+      '<div class="sw-grid">' +
+        '<div class="sw-box strengths"><div class="sw-box-title">✅ 強み</div><ul class="sw-list">' + strHtml + '</ul></div>' +
+        '<div class="sw-box weaknesses"><div class="sw-box-title">❌ 弱み</div><ul class="sw-list">' + wkHtml + '</ul></div>' +
+      '</div>' +
+    '</div>' +
+
+    // COUNTERS
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">🚫</span>カウンターチャンプ</div>' +
+      '<div class="counters-list">' + ctrHtml + '</div>' +
+    '</div>' +
+
+    // TIPS
+    '<div class="section">' +
+      '<div class="section-title"><span class="section-icon">💡</span>プレイのコツ</div>' +
+      '<div class="tips-grid">' +
+        '<div class="tip-box beginner"><div class="tip-label">🌱 初心者向け</div><div class="tip-text">' + c.beginner_tip + '</div></div>' +
+        '<div class="tip-box advanced"><div class="tip-label">🔥 上級者向け</div><div class="tip-text">' + c.advanced_tip + '</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    bottomNavHtml;
+
+  document.getElementById('page-content').innerHTML = html;
+
+})();
+</script>
+</body>
+</html>

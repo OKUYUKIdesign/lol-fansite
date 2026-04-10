@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MID LANE GUIDE — LoL Fansite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0e0e18;
+  --surface:  #16162a;
+  --card:     #1c1c32;
+  --border:   rgba(255,255,255,0.07);
+  --text:     #e8e0ff;
+  --muted:    rgba(232,224,255,0.45);
+  --accent:   #7c6fff;
+  --accent2:  #ff6fd8;
+  --glow:     rgba(124,111,255,0.25);
+  --gold:     #ffd166;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BG decoration ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,111,255,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 10% 90%, rgba(255,111,216,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 20px 80px; }
+
+/* ── HEADER ── */
+.site-header {
+  padding: 48px 0 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.logo-block {}
+.logo-eyebrow {
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.logo-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(42px, 8vw, 72px);
+  line-height: 0.9;
+  color: var(--text);
+  letter-spacing: 2px;
+}
+.logo-title span {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-sub {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.header-stats {
+  display: flex;
+  gap: 24px;
+}
+.hstat {
+  text-align: right;
+}
+.hstat-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: var(--gold);
+  line-height: 1;
+}
+.hstat-l {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ── CHAMP GRID ── */
+.champ-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.champ-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 16px 16px;
+  cursor: pointer;
+  transition: all .22s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+.champ-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity .22s;
+}
+.champ-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124,111,255,0.4);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 30px var(--glow);
+}
+.champ-card:hover::before { opacity: 1; }
+
+.champ-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.champ-icon::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent2)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .22s;
+}
+.champ-card:hover .champ-icon::after { opacity: 1; }
+
+.champ-name-jp {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+.champ-name-en {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.champ-arch-badge {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid;
+  margin-bottom: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.champ-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.champ-diff {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+.champ-dmg {
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.dmg-ap { background: rgba(100,120,255,0.2); color: #a0b0ff; }
+.dmg-ad { background: rgba(255,160,80,0.2); color: #ffa060; }
+.dmg-mix { background: rgba(255,200,80,0.2); color: #ffc850; }
+
+
+.champ-card.hidden { display: none; }
+
+/* ── FOOTER ── */
+.site-footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 2;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.champ-card { animation: fadeUp .4s ease both; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="logo-block">
+      <a href="index.html" style="display:inline-block;margin-bottom:12px;font-size:11px;letter-spacing:3px;color:var(--accent);text-decoration:none;opacity:0.8">← HOME</a>
+      <div class="logo-eyebrow">League of Legends Fansite</div>
+      <h1 class="logo-title">MID<br><span>LANE</span><br>GUIDE</h1>
+      <p class="logo-sub">Patch 26.7 対応 ／ 23チャンプ収録</p>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-n">23</div>
+        <div class="hstat-l">Champs</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-n">26.7</div>
+        <div class="hstat-l">Patch</div>
+      </div>
+    </div>
+  </header>
+  <!-- GRID -->
+  <div class="champ-grid" id="grid"></div>
+
+  <footer class="site-footer">
+    このサイトはファンメイドです。League of Legends および関連素材は Riot Games の著作物です。<br>
+    データは Patch 26.7 時点のものです。
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+
+  var grid = document.getElementById('grid');
+
+  // ── EMOJI MAP ──
+  var EMOJI = {
+    'コントロールメイジ':       '🔮',
+    'APアサシン':               '⚡',
+    'ADアサシン':               '🗡️',
+    'バーストメイジ':           '💥',
+    'アーティラリーメイジ':     '🏹',
+    'APファイター':             '🔥',
+    'ファイター':               '⚔️',
+    'マークスマン（AD/AP混合）':'🎯',
+    'スケーリングメイジ':       '🌟',
+    'タンク/コントロールメイジ':'🛡️'
+  };
+
+  // ── BUILD CARDS ──
+  function buildCards(){
+    grid.innerHTML = '';
+    var shown = 0;
+
+    CHAMP_LIST.forEach(function(id, idx){
+      var c = CHAMPS[id];
+      if(!c) return;
+      shown++;
+
+      var dmgClass = c.damage === 'AP' ? 'dmg-ap' : c.damage === 'AD' ? 'dmg-ad' : 'dmg-mix';
+      var archColor = ARCHETYPE_COLOR[c.archetype] || '#aaa';
+      var emoji = EMOJI[c.archetype] || '✨';
+      var stars = DIFFICULTY_LABEL[c.difficulty] || '';
+
+      var card = document.createElement('a');
+      card.className = 'champ-card';
+      card.href = 'champ.html?id=' + id;
+      card.style.animationDelay = (idx * 30) + 'ms';
+
+      card.innerHTML =
+        '<div class="champ-icon" style="background:' + archColor + '22">' + emoji + '</div>' +
+        '<div class="champ-name-jp">' + c.name + '</div>' +
+        '<div class="champ-name-en">' + c.en.toUpperCase() + '</div>' +
+        '<div class="champ-arch-badge" style="color:' + archColor + ';border-color:' + archColor + '55">' + c.archetype + '</div>' +
+        '<div class="champ-meta">' +
+          '<div class="champ-diff">' + stars + '</div>' +
+          '<div class="champ-dmg ' + dmgClass + '">' + c.damage + '</div>' +
+        '</div>';
+
+      grid.appendChild(card);
+    });
+
+    if(shown === 0){
+      var empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.innerHTML = '<div class="empty-state-icon">😅</div><div>チャンプが見つかりませんでした</div>';
+      grid.appendChild(empty);
+    }
+  }
+  // init
+  buildCards();
+
+})();
+</script>
+</body>
+</html>
