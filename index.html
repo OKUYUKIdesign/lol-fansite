@@ -98,28 +98,37 @@ body::after {
   letter-spacing: 6px;
   color: var(--accent);
   text-transform: uppercase;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
   animation: fadeUp .6s ease both;
 }
 .hero-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(56px, 14vw, 110px);
-  line-height: 0.9;
-  letter-spacing: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   animation: fadeUp .6s .1s ease both;
+  line-height: 1;
 }
-.hero-title .line1 { color: var(--text); display: block; }
+.hero-title .line1 {
+  display: inline-block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+  vertical-align: middle;
+}
 .hero-title .line2 {
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   display: block;
   font-family: 'M PLUS Rounded 1c', sans-serif;
   font-weight: 800;
-  font-size: clamp(48px, 12vw, 96px);
-  letter-spacing: 8px;
+  font-size: clamp(64px, 16vw, 130px);
+  letter-spacing: 12px;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px rgba(124,111,255,0.4));
 }
 .hero-sub {
   font-size: 14px;
@@ -408,17 +417,6 @@ body::after {
     <div class="hero-divider"></div>
   </section>
 
-  <!-- STATS BAR -->
-  <div class="stats-bar">
-    <div class="stat-cell">
-      <div class="stat-cell-n">30</div>
-      <div class="stat-cell-l">チャンプ収録</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-cell-n">120</div>
-      <div class="stat-cell-l">診断テスト設問</div>
-    </div>
-  </div>
 
   <!-- SECTION 1: CONTENTS -->
   <div class="content-section">
