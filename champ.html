@@ -486,6 +486,60 @@ body::before {
 .nav-btn-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; color: var(--muted); }
 .nav-btn-name { font-weight: 800; font-size: 13px; }
 
+/* ── SKILL ICON ── */
+.skill-icon {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.skill-icon img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* ── BUILD ITEM ICON ── */
+.build-item-img {
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+/* ── COUNTER ICON (image) ── */
+.counter-icon { overflow: hidden; }
+.counter-icon img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  border-radius: 50%;
+}
+
+/* ── RUNE FULL TREE ── */
+.rune-tree { display: flex; gap: 16px; flex-wrap: wrap; }
+.rune-path-block {
+  flex: 1; min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.rune-path-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.rune-path-img { width: 24px; height: 24px; object-fit: contain; }
+.rune-path-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.rune-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.rune-row:last-child { margin-bottom: 0; }
+.rune-img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: var(--card); }
+.rune-img.keystone { width: 36px; height: 36px; }
+.rune-row-name { font-size: 12px; color: var(--text); }
+.rune-row-name.keystone { font-size: 13px; font-weight: 800; color: var(--gold); }
+
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(16px); }
   to   { opacity:1; transform:translateY(0); }
@@ -542,6 +596,35 @@ body::before {
   var DD_ID = { 'LeBlanc': 'Leblanc', 'Aurelion Sol': 'AurelionSol' };
   var imgUrl = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + (DD_ID[c.en] || c.en) + '.png';
 
+  // DDragon Japanese name aliases (data.js name → DDragon ja_JP name)
+  var RUNE_ALIAS = {
+    'エレクトロキュート': '電撃',
+    'コンカー':           '征服者',
+    'フリート・フットワーク': 'フリートフットワーク',
+    'グレイシャル・オーグメント': 'グレイシャルオーグメント',
+    'レタルテンポ':       'リーサルテンポ',
+    'レタリビューション': 'リーサルテンポ',
+    'アークエンジェル':   '秘儀の彗星'
+  };
+  var PATH_ALIAS = {
+    'ソーサリー':     '魔道',
+    'ドミネーション': '覇道',
+    'プレシジョン':   '栄華',
+    'リゾルブ':       '不滅',
+    'インスピレーション': '天啓'
+  };
+  var ITEM_ALIAS = {
+    'ゾニャの砂時計':     'ゾーニャの砂時計',
+    'バンシーズ・ヴェール': 'バンシー ヴェール',
+    'ルーデンの嵐の刃':   'ルーデン コンパニオン',
+    'ラバドン・デスキャップ': 'ラバドン デスキャップ',
+    'ヴォイド・スタッフ': 'ヴォイド スタッフ',
+    'ソーサラーシューズ': 'ソーサラー シューズ',
+    'アイオニアブーツ':   'アイオニア ブーツ',
+    'プレデター':         'プレデター'
+  };
+  function resolveItemName(n){ return ITEM_ALIAS[n] || n.replace(/・/g,' '); }
+
   var dmgBadgeClass = c.damage === 'AP' ? 'badge-dmg-ap' : c.damage === 'AD' ? 'badge-dmg-ad' : 'badge-dmg-mix';
 
   // stat bar color based on value
@@ -580,6 +663,7 @@ body::before {
     skillsHtml +=
       '<div class="skill-row">' +
         '<div class="skill-key">' + sk.key + '</div>' +
+        '<div class="skill-icon"><img data-spell-key="' + sk.key + '" src="" alt="' + sk.name + '"></div>' +
         '<div class="skill-content">' +
           '<div class="skill-name">' + sk.name + '</div>' +
           '<div class="skill-desc">' + sk.desc + '</div>' +
@@ -589,27 +673,12 @@ body::before {
 
   // ── Build ──
   var coreItems = c.build.core.map(function(item){
-    return '<div class="build-item core"><span class="build-item-icon">⚔️</span>' + item + '</div>';
+    return '<div class="build-item core"><img class="build-item-img" data-item="' + item + '" src="" alt="' + item + '">' + item + '</div>';
   }).join('');
 
   var sitItems = c.build.situational.map(function(item){
-    return '<div class="build-item situational">◇ ' + item + '</div>';
+    return '<div class="build-item situational"><img class="build-item-img" data-item="' + item + '" src="" alt="' + item + '">' + item + '</div>';
   }).join('');
-
-  // ── Rune icon ──
-  var runeIcons = {
-    'エレクトロキュート': '⚡',
-    'コンカー':          '🔥',
-    'フリート・フットワーク': '💨',
-    'フェイズラッシュ':  '🌀',
-    'アフターショック':  '🛡️',
-    'アークエンジェル':  '👼',
-    'グレイシャル・オーグメント': '❄️',
-    'レタリビューション': '🌟',
-    'レタルテンポ':      '⚔️',
-    'インスピレーション':'💡'
-  };
-  var runeIcon = runeIcons[c.runes.main] || '💎';
 
   // ── Strengths / Weaknesses ──
   var strHtml = c.strengths.map(function(s){ return '<li>' + s + '</li>'; }).join('');
@@ -618,10 +687,12 @@ body::before {
   // ── Counters ──
   var ctrHtml = '';
   c.counters.forEach(function(ctr){
-    var initials = ctr.name.slice(0, 2);
+    var ctrChamp = CHAMPS[ctr.id];
+    var ctrEn = ctrChamp ? (DD_ID[ctrChamp.en] || ctrChamp.en) : (ctr.id.charAt(0).toUpperCase() + ctr.id.slice(1));
+    var ctrImg = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/img/champion/' + ctrEn + '.png';
     ctrHtml +=
       '<a href="champ.html?id=' + ctr.id + '" class="counter-card">' +
-        '<div class="counter-icon">' + initials + '</div>' +
+        '<div class="counter-icon"><img src="' + ctrImg + '" alt="' + ctr.name + '"></div>' +
         '<div class="counter-info">' +
           '<div class="counter-name">' + ctr.name + '</div>' +
           '<div class="counter-reason">' + ctr.reason + '</div>' +
@@ -653,7 +724,7 @@ body::before {
     '<div class="champ-hero">' +
       '<div class="hero-icon"><img src="' + imgUrl + '" alt="' + c.name + '"></div>' +
       '<div class="hero-info">' +
-        '<div class="hero-eyebrow">MID LANE</div>' +
+        '<div class="hero-eyebrow">' + (c.role || 'CHAMPION') + '</div>' +
         '<div class="hero-name">' + c.en.toUpperCase() + '</div>' +
         '<div class="hero-title">' + c.name + ' ／ ' + c.title + '</div>' +
         '<div class="hero-badges">' +
@@ -698,12 +769,26 @@ body::before {
     // RUNES
     '<div class="section">' +
       '<div class="section-title"><span class="section-icon">💎</span>推奨ルーン</div>' +
-      '<div class="rune-section">' +
-        '<div class="rune-icon">' + runeIcon + '</div>' +
-        '<div>' +
-          '<div class="rune-main">' + c.runes.main + '</div>' +
-          '<div class="rune-sub">サブツリー: ' + c.runes.secondary + '</div>' +
-          '<div class="rune-reason">' + c.runes.keystone_reason + '</div>' +
+      '<div class="rune-tree">' +
+        '<div class="rune-path-block">' +
+          '<div class="rune-path-header">' +
+            '<img class="rune-path-img" id="rune-main-path-img" src="" alt="">' +
+            '<span class="rune-path-label" id="rune-main-path-name">メインパス</span>' +
+          '</div>' +
+          '<div class="rune-row">' +
+            '<img class="rune-img keystone" id="rune-keystone-img" src="" alt="' + c.runes.main + '">' +
+            '<span class="rune-row-name keystone">' + (RUNE_ALIAS[c.runes.main] || c.runes.main) + '</span>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px">' + c.runes.keystone_reason + '</div>' +
+        '</div>' +
+        '<div class="rune-path-block">' +
+          '<div class="rune-path-header">' +
+            '<img class="rune-path-img" id="rune-sub-path-img" src="" alt="">' +
+            '<span class="rune-path-label">サブパス</span>' +
+          '</div>' +
+          '<div class="rune-row">' +
+            '<span class="rune-row-name" style="color:var(--accent)">' + (PATH_ALIAS[c.runes.secondary] || c.runes.secondary) + '</span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
     '</div>' +
@@ -735,6 +820,70 @@ body::before {
     bottomNavHtml;
 
   document.getElementById('page-content').innerHTML = html;
+
+  // ── Async: DDragon icon fetches ──
+  var ddBase = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/';
+  var ddChampId = DD_ID[c.en] || c.en.replace(/\s/g,'');
+
+  // Skill icons
+  fetch(ddBase + 'data/ja_JP/champion/' + ddChampId + '.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var cd = data.data[ddChampId];
+      if(!cd) return;
+      var passEl = document.querySelector('[data-spell-key="P"]');
+      if(passEl) passEl.src = ddBase + 'img/passive/' + cd.passive.image.full;
+      ['Q','W','E','R'].forEach(function(k, i){
+        var el = document.querySelector('[data-spell-key="' + k + '"]');
+        if(el && cd.spells[i]) el.src = ddBase + 'img/spell/' + cd.spells[i].image.full;
+      });
+    })
+    .catch(function(){});
+
+  // Item icons
+  fetch(ddBase + 'data/ja_JP/item.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var nameToId = {};
+      Object.keys(data.data).forEach(function(id){
+        nameToId[data.data[id].name] = id;
+      });
+      document.querySelectorAll('.build-item-img[data-item]').forEach(function(img){
+        var resolved = resolveItemName(img.dataset.item);
+        var id = nameToId[resolved];
+        if(id) img.src = ddBase + 'img/item/' + id + '.png';
+        else img.style.display = 'none';
+      });
+    })
+    .catch(function(){});
+
+  // Rune icons
+  var ddMainRune  = RUNE_ALIAS[c.runes.main]      || c.runes.main;
+  var ddSubPath   = PATH_ALIAS[c.runes.secondary]  || c.runes.secondary;
+  fetch(ddBase + 'data/ja_JP/runesReforged.json')
+    .then(function(r){ return r.json(); })
+    .then(function(paths){
+      var ddRuneBase = 'https://ddragon.leagueoflegends.com/cdn/img/';
+      paths.forEach(function(path){
+        // Secondary path icon
+        if(path.name === ddSubPath){
+          var el = document.getElementById('rune-sub-path-img');
+          if(el) el.src = ddRuneBase + path.icon;
+        }
+        // Main path: find keystone
+        path.slots[0].runes.forEach(function(rune){
+          if(rune.name === ddMainRune){
+            var pathImg = document.getElementById('rune-main-path-img');
+            if(pathImg) pathImg.src = ddRuneBase + path.icon;
+            var pathName = document.getElementById('rune-main-path-name');
+            if(pathName) pathName.textContent = path.name;
+            var ksImg = document.getElementById('rune-keystone-img');
+            if(ksImg) ksImg.src = ddRuneBase + rune.icon;
+          }
+        });
+      });
+    })
+    .catch(function(){});
 
 })();
 </script>
