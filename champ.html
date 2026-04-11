@@ -641,6 +641,28 @@ body::before {
   };
   function resolveItemName(n){ return ITEM_ALIAS[n] || n.replace(/・/g,' '); }
 
+  // data.js keystone name → [slot1, slot2, slot3] typical DDragon rune names
+  var MAIN_RUNE_PICKS = {
+    'エレクトロキュート':       ['血の味わい',       '第六感',           '至極の賞首狩り'],
+    '魂の収穫':                 ['追い打ち',         '第六感',           '至極の賞首狩り'],
+    'アークエンジェル':         ['マナフローバンド', '至高',             '強まる嵐'],
+    'フェイズラッシュ':         ['マナフローバンド', '至高',             '水走り'],
+    'コンカー':                 ['凱旋',             'レジェンド: 迅速', '最期の慈悲'],
+    'レタルテンポ':             ['体力吸収',         'レジェンド: 迅速', '最期の慈悲'],
+    'レタリビューション':       ['体力吸収',         'レジェンド: 迅速', '最期の慈悲'],
+    'フリート・フットワーク':   ['体力吸収',         'レジェンド: 血脈', '最期の慈悲'],
+    'グレイシャル・オーグメント': ['魔法の靴',        'ビスケットデリバリー', '宇宙の英知'],
+    'アフターショック':         ['打ちこわし',       'ボーンアーマー',   '生気付与']
+  };
+  // data.js secondary path name → [sub1, sub2] typical DDragon rune names
+  var SUB_RUNE_PICKS = {
+    'ソーサリー':       ['マナフローバンド', '至高'],
+    'ドミネーション':   ['血の味わい',       '至極の賞首狩り'],
+    'プレシジョン':     ['凱旋',             '最期の慈悲'],
+    'リゾルブ':         ['ボーンアーマー',   '生気付与'],
+    'インスピレーション': ['魔法の靴',        'ビスケットデリバリー']
+  };
+
   var dmgBadgeClass = c.damage === 'AP' ? 'badge-dmg-ap' : c.damage === 'AD' ? 'badge-dmg-ad' : 'badge-dmg-mix';
 
   // stat bar color based on value
@@ -783,31 +805,48 @@ body::before {
     '</div>' +
 
     // RUNES
-    '<div class="section">' +
-      '<div class="section-title"><span class="section-icon">💎</span>推奨ルーン</div>' +
-      '<div class="rune-tree">' +
-        '<div class="rune-path-block">' +
-          '<div class="rune-path-header">' +
-            '<img class="rune-path-img" id="rune-main-path-img" src="" alt="">' +
-            '<span class="rune-path-label" id="rune-main-path-name">メインパス</span>' +
+    (function(){
+      var mainPicks = MAIN_RUNE_PICKS[c.runes.main] || [];
+      var subPicks  = SUB_RUNE_PICKS[c.runes.secondary] || [];
+      var mainRows = mainPicks.map(function(rn, i){
+        return '<div class="rune-row">' +
+          '<img class="rune-img" id="rune-main-' + i + '" src="" alt="' + rn + '">' +
+          '<span class="rune-row-name">' + rn + '</span>' +
+        '</div>';
+      }).join('');
+      var subRows = subPicks.map(function(rn, i){
+        return '<div class="rune-row">' +
+          '<img class="rune-img" id="rune-sub-' + i + '" src="" alt="' + rn + '">' +
+          '<span class="rune-row-name">' + rn + '</span>' +
+        '</div>';
+      }).join('');
+      return (
+        '<div class="section">' +
+          '<div class="section-title"><span class="section-icon">💎</span>推奨ルーン</div>' +
+          '<div class="rune-tree">' +
+            '<div class="rune-path-block">' +
+              '<div class="rune-path-header">' +
+                '<img class="rune-path-img" id="rune-main-path-img" src="" alt="">' +
+                '<span class="rune-path-label" id="rune-main-path-name">メインパス</span>' +
+              '</div>' +
+              '<div class="rune-row">' +
+                '<img class="rune-img keystone" id="rune-keystone-img" src="" alt="' + c.runes.main + '">' +
+                '<span class="rune-row-name keystone">' + (RUNE_ALIAS[c.runes.main] || c.runes.main) + '</span>' +
+              '</div>' +
+              mainRows +
+              '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">' + c.runes.keystone_reason + '</div>' +
+            '</div>' +
+            '<div class="rune-path-block">' +
+              '<div class="rune-path-header">' +
+                '<img class="rune-path-img" id="rune-sub-path-img" src="" alt="">' +
+                '<span class="rune-path-label" id="rune-sub-path-name">サブパス</span>' +
+              '</div>' +
+              subRows +
+            '</div>' +
           '</div>' +
-          '<div class="rune-row">' +
-            '<img class="rune-img keystone" id="rune-keystone-img" src="" alt="' + c.runes.main + '">' +
-            '<span class="rune-row-name keystone">' + (RUNE_ALIAS[c.runes.main] || c.runes.main) + '</span>' +
-          '</div>' +
-          '<div style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px">' + c.runes.keystone_reason + '</div>' +
-        '</div>' +
-        '<div class="rune-path-block">' +
-          '<div class="rune-path-header">' +
-            '<img class="rune-path-img" id="rune-sub-path-img" src="" alt="">' +
-            '<span class="rune-path-label">サブパス</span>' +
-          '</div>' +
-          '<div class="rune-row">' +
-            '<span class="rune-row-name" style="color:var(--accent)">' + (PATH_ALIAS[c.runes.secondary] || c.runes.secondary) + '</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
+        '</div>'
+      );
+    })() +
 
     // STRENGTHS / WEAKNESSES
     '<div class="section">' +
@@ -874,19 +913,25 @@ body::before {
     .catch(function(){});
 
   // Rune icons
-  var ddMainRune  = RUNE_ALIAS[c.runes.main]      || c.runes.main;
-  var ddSubPath   = PATH_ALIAS[c.runes.secondary]  || c.runes.secondary;
+  var ddMainRune = RUNE_ALIAS[c.runes.main]     || c.runes.main;
+  var ddSubPath  = PATH_ALIAS[c.runes.secondary] || c.runes.secondary;
+  var mainPicks  = MAIN_RUNE_PICKS[c.runes.main] || [];
+  var subPicks   = SUB_RUNE_PICKS[c.runes.secondary] || [];
   fetch(ddBase + 'data/ja_JP/runesReforged.json')
     .then(function(r){ return r.json(); })
     .then(function(paths){
       var ddRuneBase = 'https://ddragon.leagueoflegends.com/cdn/img/';
+      // Build a flat name→icon map
+      var runeIconMap = {};
       paths.forEach(function(path){
-        // Secondary path icon
-        if(path.name === ddSubPath){
-          var el = document.getElementById('rune-sub-path-img');
-          if(el) el.src = ddRuneBase + path.icon;
-        }
-        // Main path: find keystone
+        path.slots.forEach(function(slot){
+          slot.runes.forEach(function(rune){
+            runeIconMap[rune.name] = ddRuneBase + rune.icon;
+          });
+        });
+      });
+      paths.forEach(function(path){
+        // Main path
         path.slots[0].runes.forEach(function(rune){
           if(rune.name === ddMainRune){
             var pathImg = document.getElementById('rune-main-path-img');
@@ -897,6 +942,23 @@ body::before {
             if(ksImg) ksImg.src = ddRuneBase + rune.icon;
           }
         });
+        // Sub path
+        if(path.name === ddSubPath){
+          var subEl = document.getElementById('rune-sub-path-img');
+          if(subEl) subEl.src = ddRuneBase + path.icon;
+          var subName = document.getElementById('rune-sub-path-name');
+          if(subName) subName.textContent = path.name;
+        }
+      });
+      // Main rune rows (slots 1-3)
+      mainPicks.forEach(function(rn, i){
+        var el = document.getElementById('rune-main-' + i);
+        if(el && runeIconMap[rn]) el.src = runeIconMap[rn];
+      });
+      // Sub rune rows
+      subPicks.forEach(function(rn, i){
+        var el = document.getElementById('rune-sub-' + i);
+        if(el && runeIconMap[rn]) el.src = runeIconMap[rn];
       });
     })
     .catch(function(){});

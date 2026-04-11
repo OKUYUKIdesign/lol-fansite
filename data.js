@@ -256,7 +256,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'マナ消費が激しいゼラスに最も必要なアーケイン・コメット+マナ確保。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -326,7 +326,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'マナ安定とAP確保。マルザーハールのE連打とR中の持続火力を最大化。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -396,7 +396,7 @@ var CHAMPS = {
     runes: {
       main: 'フェイズラッシュ',
       keystone_reason: 'Rスタック時の移動速度をさらに高め、相手から逃げられなくなる状況を作る。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -466,7 +466,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'Q→W→Eのコンボでほぼ確実に発動。バーストコンボの火力を最大化できる。',
-      secondary: 'ドミネーション'
+      secondary: 'ソーサリー'
     },
 
     strengths: [
@@ -536,7 +536,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'R→E→Q→AAコンボで確実に発動。バーストダメージを最大化。',
-      secondary: 'ドミネーション'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -816,7 +816,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'マナ管理とAP積み上げ。リサンドラのQ連打による消費をカバー。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -886,7 +886,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'E連打のマナ消費をカバーしつつAP積み上げ。後半の爆発的なAPに直結する。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1026,7 +1026,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'Rのマナ消費が非常に激しいためマナ管理が最優先。AP積み上げも同時に達成できる。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1096,7 +1096,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'Q→W→Eのコンボで確実に3ヒット。Rと組み合わせて最大バーストを発揮。',
-      secondary: 'ドミネーション'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1166,7 +1166,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'E→Q→Wのコンボで確実に3ヒット。バーストダメージを最大化。',
-      secondary: 'ドミネーション'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1306,7 +1306,7 @@ var CHAMPS = {
     runes: {
       main: 'アークエンジェル',
       keystone_reason: 'マナ安定とAP積み上げでスタックの成長を加速。後半の爆発力を最大化。',
-      secondary: 'ソーサリー'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1651,7 +1651,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'バーストコンボで確実に発動できる。E→Q→W→AAでほぼ確定発動。ダメージ底上げが暗殺成功率に直結。',
-      secondary: 'ドミネーション'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
@@ -1707,7 +1707,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'P→Q→E→AAの短いコンボで確実に発動。一瞬のトレードでバーストを最大化するのに最適。',
-      secondary: 'ドミネーション'
+      secondary: 'ソーサリー'
     },
 
     strengths: [
@@ -1875,7 +1875,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'Q→E→R→AAのコンボで確実に発動。Lv6以降のワンコンボで相手を溶かすバーストを補強する。',
-      secondary: 'ドミネーション'
+      secondary: 'ソーサリー'
     },
 
     strengths: [
@@ -1931,7 +1931,7 @@ var CHAMPS = {
     runes: {
       main: 'レタルテンポ',
       keystone_reason: 'Q連打とWのコンボ中にスタックが積まれ、集団戦でのAADPSが爆発的に増加。長期戦になるほど強い。',
-      secondary: 'コンカー'
+      secondary: 'リゾルブ'
     },
 
     strengths: [
@@ -1987,7 +1987,7 @@ var CHAMPS = {
     runes: {
       main: 'エレクトロキュート',
       keystone_reason: 'Q→E→AAの短いコンボで確実に発動。難しい操作なしに高いバーストを出せる初心者向けのセットアップ。',
-      secondary: 'ドミネーション'
+      secondary: 'インスピレーション'
     },
 
     strengths: [
